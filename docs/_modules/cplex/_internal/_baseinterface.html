@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._baseinterface &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._baseinterface</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._baseinterface</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _baseinterface.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Base-interface of the CPLEX API&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_aux_functions</span> <span class="k">as</span> <span class="n">_aux</span>
+
+
+<div class="viewcode-block" id="BaseInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._baseinterface.BaseInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseInterface</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Common methods for sub-interfaces.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BaseInterface.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._baseinterface.BaseInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cplex</span><span class="p">,</span> <span class="n">advanced</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new BaseInterface.</span>
+
+<span class="sd">        This class is not meant to be instantiated directly nor used</span>
+<span class="sd">        externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">advanced</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span> <span class="o">=</span> <span class="n">cplex</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">cplex</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">_env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_index_function</span> <span class="o">=</span> <span class="n">getindexfunc</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts from names to indices as necessary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_index</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_iter</span><span class="p">(</span><span class="n">getnumfun</span><span class="p">,</span> <span class="n">addfun</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="n">old</span> <span class="o">=</span> <span class="n">getnumfun</span><span class="p">()</span>
+        <span class="n">addfun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">getnumfun</span><span class="p">())</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_single</span><span class="p">(</span><span class="n">getnumfun</span><span class="p">,</span> <span class="n">addfun</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="n">addfun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">getnumfun</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># minus one for zero-based indices</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_index_function</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BaseInterface.get_indices">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._baseinterface.BaseInterface.get_indices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts from names to indices.</span>
+
+<span class="sd">        If name is a string, get_indices returns the index of the</span>
+<span class="sd">        object with that name.  If no such object exists, an</span>
+<span class="sd">        exception is raised.</span>
+
+<span class="sd">        If name is a sequence of strings, get_indices returns a list</span>
+<span class="sd">        of the indices corresponding to the strings in name.</span>
+<span class="sd">        Equivalent to map(self.get_indices, name).</span>
+
+<span class="sd">        If the subclass does not provide an index function (i.e., the</span>
+<span class="sd">        interface is not indexed), then a NotImplementedError is raised.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&quot;a&quot;, &quot;b&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; c.variables.get_indices(&quot;a&quot;)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; c.variables.get_indices([&quot;a&quot;, &quot;b&quot;])</span>
+<span class="sd">        [0, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_index_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This is not an indexed interface&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_index</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._baseinterface</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CPLEX Python API Reference Manual &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cplex" href="modules.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="cplex"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">CPLEX Python API Reference Manual</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="cplex-python-api-reference-manual">
+<h1>CPLEX Python API Reference Manual<a class="headerlink" href="#cplex-python-api-reference-manual" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">cplex</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html">cplex package</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="ibm-cplex-python-api-reference-manual">
+<h1>IBM CPLEX Python API Reference Manual<a class="headerlink" href="#ibm-cplex-python-api-reference-manual" title="Link to this heading">¶</a></h1>
+<p>The CPLEX Python API is a Python package named <a class="reference internal" href="cplex.html#module-cplex" title="cplex"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cplex</span></code></a> that allows the CPLEX Callable Library to be accessed from the Python programming language. It is equally suitable for interactive use through the Python interpreter or for writing scripts or full-fledged applications.</p>
+<p>For users of Python, CPLEX offers both a Python application programming interface (API) documented in this reference manual, as well as IBM Decision Optimization CPLEX Modeling for Python, also known as DOcplex. DOcplex is a library composed of two modules:</p>
+<ul class="simple">
+<li><p>Mathematical Programming Modeling for Python using docplex.mp (DOcplex.MP)</p></li>
+<li><p>Constraint Programming Modeling for Python using docplex.cp (DOcplex.CP)</p></li>
+</ul>
+<p>For more about DOcplex, see the <a class="reference external" href="http://ibmdecisionoptimization.github.io/docplex-doc/">DOcplex landing page</a>.</p>
+<p>The CPLEX Python API can be installed directly from PyPI or from Anaconda, using the commands <code class="docutils literal notranslate"><span class="pre">pip</span></code> and <code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
+<p>If you are using the <code class="docutils literal notranslate"><span class="pre">conda</span></code> command to install, then you should make sure the correct channel will be searched.</p>
+<p>You can add the right channel in the active environment with a command like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>config<span class="w"> </span>--add<span class="w"> </span>channels<span class="w"> </span>ibmdecisionoptimization
+</pre></div>
+</div>
+<p>The following commands install the Community Edition CPLEX and CP Optimizer run-times as well as the low-level Python interface to CPLEX.</p>
+<p>PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>cplex
+</pre></div>
+</div>
+<p>Anaconda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>cplex
+</pre></div>
+</div>
+<p>The following commands install the higher-level “docplex” Python package which includes CPLEX and CP Optimizer modeling and solving support. The Community Edition run-times which come as standard are limited in the size of the optimization problems that they can solve. To upgrade the Community Edition runtimes and remove size limitations, use the command “docplex” which was installed when you installed the “docplex” module with pip and conda.</p>
+<p>PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>docplex
+</pre></div>
+</div>
+<p>Anaconda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>docplex
+</pre></div>
+</div>
+<p>Running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docplex<span class="w"> </span>config<span class="w"> </span>--upgrade<span class="w"> </span>Full_Path_To_This_CPLEX_Studio_Installation
+</pre></div>
+</div>
+<p>will upgrade the CPLEX and CP Optimizer Python run-times from the Community Edition version to a size-unlimited version.</p>
+</section>
+<section id="what-you-need-to-know">
+<h1>What you need to know<a class="headerlink" href="#what-you-need-to-know" title="Link to this heading">¶</a></h1>
+<p>This manual assumes that you are familiar with the Python programming language.</p>
+<p>This manual also assumes that you are familiar with the operating system on which you are using CPLEX and have the appropriate version of Python installed on your system. For information about supported platforms, see Detailed System Requirements (DSR) on your IBM customer support site.</p>
+<p>For interactive use, the tab completion functionality provided by the Python module <code class="docutils literal notranslate"><span class="pre">rlcompleter</span></code> is extremely useful as you browse the CPLEX Python API. GNU/Linux systems typically include this package by default. Mac users are advised to install the package <code class="docutils literal notranslate"><span class="pre">readline</span></code> for their system. Windows users are advised either to use IDLE, the Python IDE distributed with Python, or to install the package <code class="docutils literal notranslate"><span class="pre">readline</span></code> for their system.</p>
+</section>
+<section id="structure-of-the-package-cplex">
+<h1>Structure of the package cplex<a class="headerlink" href="#structure-of-the-package-cplex" title="Link to this heading">¶</a></h1>
+<p>The CPLEX Python API is an object-oriented API providing most of its functionality through the class <code class="xref py py-class docutils literal notranslate"><span class="pre">Cplex</span></code> defined in the top level of the package <a class="reference internal" href="cplex.html#module-cplex" title="cplex"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cplex</span></code></a>. This class has a number of methods, such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Cplex.read</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">Cplex.solve</span></code> for operating on optimization problems, but most of its functionality is provided through methods of data attributes such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Cplex.linear_constraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Cplex.objective</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">Cplex.solution</span></code>. These objects provide methods for modifying and querying data associated with the corresponding parts of an optimization problem. These objects are instances of classes defined within the subpackage <code class="docutils literal notranslate"><span class="pre">cplex._internal</span></code>. As its name suggests, classes and other data defined in the package <code class="docutils literal notranslate"><span class="pre">cplex._internal</span></code> are not to be instantiated or otherwise accessed directly by the user, but rather should only be accessed as attributes of an instance of the object <code class="docutils literal notranslate"><span class="pre">Cplex</span></code>.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="#">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">cplex</a></li>
+</ul>
+
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="modules.html"
+                          title="next chapter">cplex</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="cplex"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">CPLEX Python API Reference Manual</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+<map id="inheritance03d0fc1bc6" name="inheritance03d0fc1bc6">
+<area shape="rect" id="node1" href="#cplex.callbacks.BranchType" target="_top" title="Constants defining types of branches." alt="" coords="14,80,105,107"/>
+<area shape="rect" id="node2" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+</map>

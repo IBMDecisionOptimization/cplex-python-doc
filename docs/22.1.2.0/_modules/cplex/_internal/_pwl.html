@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._pwl &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._pwl</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._pwl</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _pwl.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Piecewise Linear API&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._baseinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">_proc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_aux_functions</span> <span class="k">as</span> <span class="n">_aux</span>
+
+
+<div class="viewcode-block" id="PWLConstraintInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PWLConstraintInterface</span><span class="p">(</span><span class="n">BaseInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Methods for adding, querying, and modifying PWL constraints.</span>
+
+<span class="sd">    A PWL constraint describes a piecewise linear relationship between</span>
+<span class="sd">    two variables: vary=pwl(varx).  The PWL constraint is described by</span>
+<span class="sd">    specifying the index of the vary and varx variables involved and by</span>
+<span class="sd">    providing the breakpoints of the PWL function (specified by the</span>
+<span class="sd">    (breakx[i],breaky[i]) coordinate pairs).  Before the first segment of</span>
+<span class="sd">    the PWL function there may be a half-line; its slope is specified by</span>
+<span class="sd">    preslope.  After the last segment of the the PWL function there may</span>
+<span class="sd">    be a half-line; its slope is specified by postslope.  Two consecutive</span>
+<span class="sd">    breakpoints may have the same x coordinate, in such cases there is a</span>
+<span class="sd">    discontinuity in the PWL function.  Three consecutive breakpoints</span>
+<span class="sd">    may not have the same x coordinate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PWLConstraintInterface.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new PWLConstraintInterface.</span>
+
+<span class="sd">        The PWL constraint interface is exposed by the top-level `Cplex`</span>
+<span class="sd">        class as `Cplex.pwl_constraints`.  This constructor is not meant</span>
+<span class="sd">        to be used externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cplex</span><span class="o">=</span><span class="n">cpx</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="o">=</span><span class="n">_proc</span><span class="o">.</span><span class="n">getpwlindex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PWLConstraintInterface.get_num">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface.get_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of PWL constraints in the problem.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_num()</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;y&#39;, &#39;x&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.pwl_constraints.add(vary=&#39;y&#39;, varx=&#39;x&#39;,</span>
+<span class="sd">        ...                             preslope=0.5, postslope=2.0,</span>
+<span class="sd">        ...                             breakx=[0.0, 1.0, 2.0],</span>
+<span class="sd">        ...                             breaky=[0.0, 1.0, 4.0],</span>
+<span class="sd">        ...                             name=&#39;pwl1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumpwl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PWLConstraintInterface.add">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vary</span><span class="p">,</span> <span class="n">varx</span><span class="p">,</span> <span class="n">preslope</span><span class="p">,</span> <span class="n">postslope</span><span class="p">,</span> <span class="n">breakx</span><span class="p">,</span> <span class="n">breaky</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a PWL constraint to the problem.</span>
+
+<span class="sd">        vary: the index of the &#39;y&#39; variable in the vary=pwl(varx)</span>
+<span class="sd">        function.</span>
+
+<span class="sd">        varx: the index of the &#39;x&#39; variable in the vary=pwl(varx)</span>
+<span class="sd">        function.</span>
+
+<span class="sd">        preslope: before the first segment of the PWL function there is</span>
+<span class="sd">        a half-line; its slope is specified by preslope.</span>
+
+<span class="sd">        postslope: after the last segment of the the PWL function there</span>
+<span class="sd">        is a half-line; its slope is specified by postslope.</span>
+
+<span class="sd">        breakx: A list containing the indices of the &#39;x&#39; variables</span>
+<span class="sd">        involved.</span>
+
+<span class="sd">        breaky: A list containing the indices of the &#39;y&#39; variables</span>
+<span class="sd">        involved.</span>
+
+<span class="sd">        name: the name of the PWL constraint; defaults to the empty</span>
+<span class="sd">        string.</span>
+
+<span class="sd">        Returns the index of the PWL constraint.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;y&#39;, &#39;x&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.pwl_constraints.add(vary=&#39;y&#39;, varx=&#39;x&#39;,</span>
+<span class="sd">        ...                             preslope=0.5, postslope=2.0,</span>
+<span class="sd">        ...                             breakx=[0.0, 1.0, 2.0],</span>
+<span class="sd">        ...                             breaky=[0.0, 1.0, 4.0],</span>
+<span class="sd">        ...                             name=&#39;pwl1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># FIXME: Should we provide defaults for any of the other arguments?</span>
+        <span class="n">yidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">vary</span><span class="p">)</span>
+        <span class="n">xidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">varx</span><span class="p">)</span>
+        <span class="n">arg_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">breakx</span><span class="p">,</span> <span class="n">breaky</span><span class="p">]</span>
+        <span class="n">nbreaks</span> <span class="o">=</span> <span class="n">_aux</span><span class="o">.</span><span class="n">max_arg_length</span><span class="p">(</span><span class="n">arg_list</span><span class="p">)</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">validate_arg_lengths</span><span class="p">(</span>
+            <span class="n">arg_list</span><span class="p">,</span>
+            <span class="n">allow_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">extra_msg</span><span class="o">=</span><span class="s2">&quot;: breakx, breaky&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_add</span><span class="p">(</span><span class="n">vary</span><span class="p">,</span> <span class="n">varx</span><span class="p">,</span> <span class="n">preslope</span><span class="p">,</span> <span class="n">postslope</span><span class="p">,</span> <span class="n">breakx</span><span class="p">,</span> <span class="n">breaky</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">addpwl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                         <span class="n">vary</span><span class="p">,</span> <span class="n">varx</span><span class="p">,</span>
+                         <span class="n">preslope</span><span class="p">,</span> <span class="n">postslope</span><span class="p">,</span>
+                         <span class="n">nbreaks</span><span class="p">,</span> <span class="n">breakx</span><span class="p">,</span> <span class="n">breaky</span><span class="p">,</span>
+                         <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">,</span> <span class="n">_add</span><span class="p">,</span> <span class="n">yidx</span><span class="p">,</span> <span class="n">xidx</span><span class="p">,</span>
+                                <span class="n">preslope</span><span class="p">,</span> <span class="n">postslope</span><span class="p">,</span> <span class="n">breakx</span><span class="p">,</span> <span class="n">breaky</span><span class="p">,</span>
+                                <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PWLConstraintInterface.delete">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface.delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes PWL constraints from the problem.</span>
+
+<span class="sd">        There are four forms by which pwl_constraints.delete may be</span>
+<span class="sd">        called.</span>
+
+<span class="sd">        pwl_constraints.delete()</span>
+<span class="sd">          deletes all PWL constraints from the problem.</span>
+
+<span class="sd">        pwl_constraints.delete(i)</span>
+<span class="sd">          i must be a PWL constraint name or index. Deletes the PWL</span>
+<span class="sd">          constraint whose index or name is i.</span>
+
+<span class="sd">        pwl_constraints.delete(seq)</span>
+<span class="sd">          seq must be a sequence of PWL constraint names or indices.</span>
+<span class="sd">          Deletes the PWL constraints with names or indices contained</span>
+<span class="sd">          within s. Equivalent to [pwl_constraints.delete(i) for i in s].</span>
+
+<span class="sd">        pwl_constraints.delete(begin, end)</span>
+<span class="sd">          begin and end must be PWL constraint indices or PWL constraint</span>
+<span class="sd">          names. Deletes the PWL constraints with indices between begin</span>
+<span class="sd">          and end, inclusive of end. Equivalent to</span>
+<span class="sd">          pwl_constraints.delete(range(begin, end + 1)). This will give</span>
+<span class="sd">          the best performance when deleting batches of PWL constraints.</span>
+
+<span class="sd">        See CPXdelpwl in the Callable Library Reference Manual for more</span>
+<span class="sd">        detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;y&#39;, &#39;x&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.pwl_constraints.add(vary=&#39;y&#39;, varx=&#39;x&#39;,</span>
+<span class="sd">        ...                             preslope=0.5, postslope=2.0,</span>
+<span class="sd">        ...                             breakx=[0.0, 1.0, 2.0],</span>
+<span class="sd">        ...                             breaky=[0.0, 1.0, 4.0],</span>
+<span class="sd">        ...                             name=&#39;pwl1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.delete(idx)</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_num()</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_delete</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">delpwl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">delete_set_by_range</span><span class="p">(</span><span class="n">_delete</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PWLConstraintInterface.get_names">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface.get_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the names of a set of PWL constraints.</span>
+
+<span class="sd">        May be called by four forms.</span>
+
+<span class="sd">        pwl_constraints.get_names()</span>
+<span class="sd">          return the names of all PWL constraints in the problem.</span>
+
+<span class="sd">        pwl_constraints.get_names(i)</span>
+<span class="sd">          i must be a PWL constraint name or index.  Returns the name of</span>
+<span class="sd">          PWL constraint i.</span>
+
+<span class="sd">        pwl_constraints.get_names(seq)</span>
+<span class="sd">          seq must be a sequence of PWL constraint names or indices.</span>
+<span class="sd">          Returns the names of PWL constraints with names or indices in</span>
+<span class="sd">          s.  Equivalent to</span>
+<span class="sd">          [pwl_constraints.get_names(i) for i in s]</span>
+
+<span class="sd">        pwl_constraints.get_names(begin, end)</span>
+<span class="sd">          begin and end must be PWL constraint indices or PWL constraint</span>
+<span class="sd">          names. Returns the names of PWL constraints with indices</span>
+<span class="sd">          between begin and end, inclusive of end.  Equivalent to</span>
+<span class="sd">          pwl_constraints.get_names(range(begin, end + 1))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;y&#39;, &#39;x&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.pwl_constraints.add(vary=&#39;y&#39;, varx=&#39;x&#39;,</span>
+<span class="sd">        ...                             preslope=0.5, postslope=2.0,</span>
+<span class="sd">        ...                             breakx=[0.0, 1.0, 2.0],</span>
+<span class="sd">        ...                             breaky=[0.0, 1.0, 4.0],</span>
+<span class="sd">        ...                             name=&#39;pwl1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_names(idx)</span>
+<span class="sd">        &#39;pwl1&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_names</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getpwlname</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span>
+            <span class="n">_get_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PWLConstraintInterface.get_definitions">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._pwl.PWLConstraintInterface.get_definitions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the definitions of a set of PWL constraints.</span>
+
+<span class="sd">        Returns a list of PWL definitions, where each definition is a</span>
+<span class="sd">        list containing the following components: vary, varx, preslope,</span>
+<span class="sd">        postslope, breakx, breaky (see `add`).</span>
+
+<span class="sd">        May be called by four forms.</span>
+
+<span class="sd">        pwl_constraints.get_definitions()</span>
+<span class="sd">          return the definitions of all PWL constraints in the</span>
+<span class="sd">          problem.</span>
+
+<span class="sd">        pwl_constraints.get_definitions(i)</span>
+<span class="sd">          i must be a PWL constraint name or index.  Returns the</span>
+<span class="sd">          definition of PWL constraint i.</span>
+
+<span class="sd">        pwl_constraints.get_definitions(seq)</span>
+<span class="sd">          seq must be a sequence of PWL constraint names or indices.</span>
+<span class="sd">          Returns the definitions of PWL constraints with names or</span>
+<span class="sd">          indices in s.  Equivalent to</span>
+<span class="sd">          [pwl_constraints.get_definitions(i) for i in s]</span>
+
+<span class="sd">        pwl_constraints.get_definitions(begin, end)</span>
+<span class="sd">          begin and end must be PWL constraint indices or PWL constraint</span>
+<span class="sd">          names. Returns the definitions of PWL constraints with indices</span>
+<span class="sd">          between begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          pwl_constraints.get_definitions(list(range(begin, end + 1)))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;y&#39;, &#39;x&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.pwl_constraints.add(vary=&#39;y&#39;, varx=&#39;x&#39;,</span>
+<span class="sd">        ...                             preslope=0.5, postslope=2.0,</span>
+<span class="sd">        ...                             breakx=[0.0, 1.0, 2.0],</span>
+<span class="sd">        ...                             breaky=[0.0, 1.0, 4.0],</span>
+<span class="sd">        ...                             name=&#39;pwl1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.pwl_constraints.get_definitions(idx)</span>
+<span class="sd">        [0, 1, 0.5, 2.0, [0.0, 1.0, 2.0], [0.0, 1.0, 4.0]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_getpwl</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getpwl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span><span class="n">_getpwl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._pwl</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._anno &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._anno</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._anno</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _anno.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Annotation API&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._baseinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">_proc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_aux_functions</span> <span class="k">as</span> <span class="n">_aux</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constant_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantClass</span>
+
+
+<div class="viewcode-block" id="AnnotationObjectType">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.AnnotationObjectType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnnotationObjectType</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Constants defining annotation object types.&quot;&quot;&quot;</span>
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ANNOTATIONOBJ_OBJ</span>
+    <span class="n">variable</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ANNOTATIONOBJ_COL</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ANNOTATIONOBJ_ROW</span>
+    <span class="n">sos_constraint</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ANNOTATIONOBJ_SOS</span>
+    <span class="n">indicator_constraint</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ANNOTATIONOBJ_IND</span>
+    <span class="n">quadratic_constraint</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ANNOTATIONOBJ_QC</span></div>
+
+
+
+<div class="viewcode-block" id="AnnotationInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.AnnotationInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnnotationInterface</span><span class="p">(</span><span class="n">BaseInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Methods for adding, querying, and modifying annotations.&quot;&quot;&quot;</span>
+
+    <span class="n">object_type</span> <span class="o">=</span> <span class="n">AnnotationObjectType</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `AnnotationObjectType()` &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getnumobjtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objtype</span><span class="p">):</span>
+        <span class="n">switcher</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># NB: For now, it is documented that multiobj is not supported.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">objective</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">env</span><span class="p">,</span> <span class="n">lp</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">variable</span><span class="p">:</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumcols</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">row</span><span class="p">:</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumrows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">sos_constraint</span><span class="p">:</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumsos</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">indicator_constraint</span><span class="p">:</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumindconstrs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object_type</span><span class="o">.</span><span class="n">quadratic_constraint</span><span class="p">:</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumqconstrs</span>
+        <span class="p">}</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">switcher</span><span class="p">[</span><span class="n">objtype</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LongAnnotationInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LongAnnotationInterface</span><span class="p">(</span><span class="n">AnnotationInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Methods for adding, querying, and modifying long annotations.&quot;&quot;&quot;</span>
+
+    <span class="n">benders_annotation</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERS_ANNOTATION</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;String constant for the name of the Benders annotation.&quot;&quot;&quot;</span>
+
+    <span class="n">benders_mastervalue</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERS_MASTERVALUE</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Default value for the Benders master partition.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LongAnnotationInterface.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new LongAnnotationInterface.</span>
+
+<span class="sd">        The long annotation interface is exposed by the top-level `Cplex`</span>
+<span class="sd">        class as `Cplex.long_annotations`.  This constructor is not meant</span>
+<span class="sd">        to be used externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cplex</span><span class="o">=</span><span class="n">cpx</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="o">=</span><span class="n">_proc</span><span class="o">.</span><span class="n">getlongannoindex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.get_num">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.get_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of long annotations in the problem.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_num()</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.long_annotations.add(&#39;ann1&#39;, 0)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumlonganno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.add">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">defval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds an annotation to the problem.</span>
+
+<span class="sd">        name: the name of the annotation.</span>
+
+<span class="sd">        defval: the default value for annotation objects.</span>
+
+<span class="sd">        Returns the index of the added annotation.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.long_annotations.add(name=&#39;ann1&#39;, defval=0)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># For Python 2.7, int() will automatically upconvert to long</span>
+        <span class="c1"># if necessary.  For 3.x, there is only int (they have been</span>
+        <span class="c1"># unified).</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defval</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">newlonganno</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">defval</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">,</span> <span class="n">_add</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">defval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.delete">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes long annotations from the problem.</span>
+
+<span class="sd">        There are four forms by which long_annotations.delete may be</span>
+<span class="sd">        called.</span>
+
+<span class="sd">        long_annotations.delete()</span>
+<span class="sd">          deletes all long annotations from the problem.</span>
+
+<span class="sd">        long_annotations.delete(i)</span>
+<span class="sd">          i must be an annotation name or index. Deletes the long</span>
+<span class="sd">          annotation whose index or name is i.</span>
+
+<span class="sd">        long_annotations.delete(seq)</span>
+<span class="sd">          seq must be a sequence of annotation names or indices.</span>
+<span class="sd">          Deletes the long annotations with names or indices contained</span>
+<span class="sd">          within s. Equivalent to [long_annotations.delete(i) for i in s].</span>
+
+<span class="sd">        long_annotations.delete(begin, end)</span>
+<span class="sd">          begin and end must be annotation indices or annotation names.</span>
+<span class="sd">          Deletes the long annotations with indices between begin and</span>
+<span class="sd">          end, inclusive of end. Equivalent to</span>
+<span class="sd">          long_annotations.delete(range(begin, end + 1)). This will give</span>
+<span class="sd">          the best performance when deleting batches of long annotations.</span>
+
+<span class="sd">        See CPXdellongannotations in the Callable Library Reference</span>
+<span class="sd">        Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.long_annotations.add(&#39;ann1&#39;, 0)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.delete(idx)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_num()</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_delete</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">dellonganno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">delete_set_by_range</span><span class="p">(</span><span class="n">_delete</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.get_names">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.get_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the names of a set of long annotations.</span>
+
+<span class="sd">        May be called by four forms.</span>
+
+<span class="sd">        long_annotations.get_names()</span>
+<span class="sd">          return the names of all long annotations in the problem.</span>
+
+<span class="sd">        long_annotations.get_names(i)</span>
+<span class="sd">          i must be an annotation name or index.  Returns the name of</span>
+<span class="sd">          long annotation i.</span>
+
+<span class="sd">        long_annotations.get_names(seq)</span>
+<span class="sd">          seq must be a sequence of annotation names or indices.</span>
+<span class="sd">          Returns the names of long annotations with names or indices in</span>
+<span class="sd">          s.  Equivalent to</span>
+<span class="sd">          [long_annotations.get_names(i) for i in s]</span>
+
+<span class="sd">        long_annotations.get_names(begin, end)</span>
+<span class="sd">          begin and end must be annotation indices or annotation names.</span>
+<span class="sd">          Returns the names of long annotations with indices between</span>
+<span class="sd">          begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          long_annotations.get_names(range(begin, end + 1))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; [c.long_annotations.add(&#39;ann{0}&#39;.format(i), i)</span>
+<span class="sd">        ...  for i in range(1, 6)]</span>
+<span class="sd">        [0, 1, 2, 3, 4]</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_names()</span>
+<span class="sd">        [&#39;ann1&#39;, &#39;ann2&#39;, &#39;ann3&#39;, &#39;ann4&#39;, &#39;ann5&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_names(0)</span>
+<span class="sd">        &#39;ann1&#39;</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_names([0, 2, 4])</span>
+<span class="sd">        [&#39;ann1&#39;, &#39;ann3&#39;, &#39;ann5&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_names(1, 3)</span>
+<span class="sd">        [&#39;ann2&#39;, &#39;ann3&#39;, &#39;ann4&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_names</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getlongannoname</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span>
+            <span class="n">_get_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.get_default_values">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.get_default_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the default value of a set of long annotations.</span>
+
+<span class="sd">        May be called by four forms.</span>
+
+<span class="sd">        long_annotations.get_default_values()</span>
+<span class="sd">          return the default values of all long annotations in the</span>
+<span class="sd">          problem.</span>
+
+<span class="sd">        long_annotations.get_default_values(i)</span>
+<span class="sd">          i must be an annotation name or index.  Returns the default</span>
+<span class="sd">          value of long annotation i.</span>
+
+<span class="sd">        long_annotations.get_default_values(seq)</span>
+<span class="sd">          seq must be a sequence of annotation names or indices.</span>
+<span class="sd">          Returns the default values of long annotations with names or</span>
+<span class="sd">          indices in s.  Equivalent to</span>
+<span class="sd">          [long_annotations.get_default_values(i) for i in s]</span>
+
+<span class="sd">        long_annotations.get_default_values(begin, end)</span>
+<span class="sd">          begin and end must be annotation indices or annotation names.</span>
+<span class="sd">          Returns the default values of long annotations with indices</span>
+<span class="sd">          between begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          long_annotations.get_default_values(list(range(begin, end + 1)))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx1 = c.long_annotations.add(name=&#39;ann1&#39;, defval=0)</span>
+<span class="sd">        &gt;&gt;&gt; idx2 = c.long_annotations.add(name=&#39;ann2&#39;, defval=1)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_default_values()</span>
+<span class="sd">        [0, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_getdefval</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getlongannodefval</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span>
+            <span class="n">_getdefval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.set_values">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.set_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">objtype</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the values for objects in the specified long annotation.</span>
+
+<span class="sd">        idx: the long annotation index or name.</span>
+
+<span class="sd">        objtype: the annotation object type.</span>
+
+<span class="sd">        Can be called by two forms:</span>
+
+<span class="sd">        long_annotations.set_values(idx, objtype, i, val)</span>
+<span class="sd">          i must be a name or index.  Changes the long annotation value</span>
+<span class="sd">          of the object identified by i.</span>
+
+<span class="sd">        long_annotations.set_values(idx, objtype, seq)</span>
+<span class="sd">          seq is a sequence of pairs (i, val) as described above.</span>
+<span class="sd">          Changes the long annotation values for the specified objects.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.long_annotations.add(&#39;ann1&#39;, 0)</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.long_annotations.object_type.objective</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.set_values(idx, objtype, 0, 1)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_values(idx, objtype, 0)</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;v1&#39;, &#39;v2&#39;, &#39;v3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.long_annotations.object_type.variable</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.set_values(idx, objtype,</span>
+<span class="sd">        ...                               [(i, 1) for i in indices])</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_values(idx, objtype)</span>
+<span class="sd">        [1, 1, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_set_values</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">setlonganno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">objtype</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">apply_pairs</span><span class="p">(</span><span class="n">_set_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LongAnnotationInterface.get_values">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.LongAnnotationInterface.get_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">objtype</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the long annotation values for the specified objects.</span>
+
+<span class="sd">        idx: the long annotation index or name.</span>
+
+<span class="sd">        objtype: the annotation object type.</span>
+
+<span class="sd">        Can be called by four forms:</span>
+
+<span class="sd">        long_annotations.get_values(idx, objtype)</span>
+<span class="sd">          return the values of all objects for a given annotation.</span>
+
+<span class="sd">        long_annotations.get_values(idx, objtype, i)</span>
+<span class="sd">          i must be a name or index.  Returns the long annotation value</span>
+<span class="sd">          of the object identified by i.</span>
+
+<span class="sd">        long_annotations.get_values(idx, objtype, seq)</span>
+<span class="sd">          seq is a sequence of object names or indices.  Returns the</span>
+<span class="sd">          long annotation values for the specified objects.  Equivalent</span>
+<span class="sd">          to</span>
+<span class="sd">          [long_annotations.get_values(idx, objtype, i) for i in seq]</span>
+
+<span class="sd">        long_annotations.get_values(idx, objtype, begin, end)</span>
+<span class="sd">          begin and end must be object indices or object names. Returns</span>
+<span class="sd">          the long annotation values of objects with indices between</span>
+<span class="sd">          begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          long_annotations.get_values(range(begin, end + 1))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.long_annotations.add(&#39;ann1&#39;, 0)</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.long_annotations.object_type.objective</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.set_values(idx, objtype, 0, 1)</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_values(idx, objtype, 0)</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;v1&#39;, &#39;v2&#39;, &#39;v3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.long_annotations.object_type.variable</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.set_values(idx, objtype,</span>
+<span class="sd">        ...                               [(i, 1) for i in indices])</span>
+<span class="sd">        &gt;&gt;&gt; c.long_annotations.get_values(idx, objtype, list(indices))</span>
+<span class="sd">        [1, 1, 1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_values</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_getnumobjtype</span><span class="p">(</span><span class="n">objtype</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getlonganno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">objtype</span><span class="p">,</span>
+                                     <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_two_args</span><span class="p">(</span>
+            <span class="n">_get_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DoubleAnnotationInterface</span><span class="p">(</span><span class="n">AnnotationInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Methods for adding, querying, and modifying double annotations.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new DoubleAnnotationInterface.</span>
+
+<span class="sd">        The double annotation interface is exposed by the top-level</span>
+<span class="sd">        `Cplex` class as `Cplex.double_annotations`.  This constructor is</span>
+<span class="sd">        not meant to be used externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cplex</span><span class="o">=</span><span class="n">cpx</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="o">=</span><span class="n">_proc</span><span class="o">.</span><span class="n">getdblannoindex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.get_num">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.get_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of double annotations in the problem.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_num()</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.double_annotations.add(&#39;ann1&#39;, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumdblanno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.add">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">defval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds an annotation to the problem.</span>
+
+<span class="sd">        name: the name of the annotation.</span>
+
+<span class="sd">        defval: the default value for annotation objects.</span>
+
+<span class="sd">        Returns the index of the added annotation.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.double_annotations.add(name=&#39;ann1&#39;, defval=0.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">defval</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">newdblanno</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">defval</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_single</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">,</span> <span class="n">_add</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">defval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.delete">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes double annotations from the problem.</span>
+
+<span class="sd">        There are four forms by which double_annotations.delete may be</span>
+<span class="sd">        called.</span>
+
+<span class="sd">        double_annotations.delete()</span>
+<span class="sd">          deletes all double annotations from the problem.</span>
+
+<span class="sd">        double_annotations.delete(i)</span>
+<span class="sd">          i must be an annotation name or index. Deletes the double</span>
+<span class="sd">          annotation whose index or name is i.</span>
+
+<span class="sd">        double_annotations.delete(seq)</span>
+<span class="sd">          seq must be a sequence of annotation names or indices.</span>
+<span class="sd">          Deletes the double annotations with names or indices contained</span>
+<span class="sd">          within s. Equivalent to</span>
+<span class="sd">          [double_annotations.delete(i) for i in s].</span>
+
+<span class="sd">        double_annotations.delete(begin, end)</span>
+<span class="sd">          begin and end must be annotation indices or annotation names.</span>
+<span class="sd">          Deletes the double annotations with indices between begin and</span>
+<span class="sd">          end, inclusive of end. Equivalent to</span>
+<span class="sd">          double_annotations.delete(range(begin, end + 1)). This will</span>
+<span class="sd">          give the best performance when deleting batches of double</span>
+<span class="sd">          annotations.</span>
+
+<span class="sd">        See CPXdeldblannotations in the Callable Library Reference Manual</span>
+<span class="sd">        for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.double_annotations.add(&#39;ann1&#39;, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.delete(idx)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_num()</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_delete</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">deldblanno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">delete_set_by_range</span><span class="p">(</span><span class="n">_delete</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.get_names">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.get_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the names of a set of double annotations.</span>
+
+<span class="sd">        May be called by four forms.</span>
+
+<span class="sd">        double_annotations.get_names()</span>
+<span class="sd">          return the names of all double annotations in the problem.</span>
+
+<span class="sd">        double_annotations.get_names(i)</span>
+<span class="sd">          i must be an annotation name or index.  Returns the name of</span>
+<span class="sd">          double annotation i.</span>
+
+<span class="sd">        double_annotations.get_names(seq)</span>
+<span class="sd">          seq must be a sequence of annotation names or indices.</span>
+<span class="sd">          Returns the names of double annotations with names or indices</span>
+<span class="sd">          in s.  Equivalent to</span>
+<span class="sd">          [double_annotations.get_names(i) for i in s]</span>
+
+<span class="sd">        double_annotations.get_names(begin, end)</span>
+<span class="sd">          begin and end must be annotation indices or annotation names.</span>
+<span class="sd">          Returns the names of double annotations with indices between</span>
+<span class="sd">          begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          double_annotations.get_names(range(begin, end + 1))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; [c.double_annotations.add(&#39;ann{0}&#39;.format(i), i)</span>
+<span class="sd">        ...  for i in range(1, 6)]</span>
+<span class="sd">        [0, 1, 2, 3, 4]</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_names()</span>
+<span class="sd">        [&#39;ann1&#39;, &#39;ann2&#39;, &#39;ann3&#39;, &#39;ann4&#39;, &#39;ann5&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_names(0)</span>
+<span class="sd">        &#39;ann1&#39;</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_names([0, 2, 4])</span>
+<span class="sd">        [&#39;ann1&#39;, &#39;ann3&#39;, &#39;ann5&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_names(1, 3)</span>
+<span class="sd">        [&#39;ann2&#39;, &#39;ann3&#39;, &#39;ann4&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_names</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getdblannoname</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span>
+            <span class="n">_get_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.get_default_values">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.get_default_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the default value of a set of double annotations.</span>
+
+<span class="sd">        May be called by four forms.</span>
+
+<span class="sd">        double_annotations.get_default_values()</span>
+<span class="sd">          return the default values of all double annotations in the</span>
+<span class="sd">          problem.</span>
+
+<span class="sd">        double_annotations.get_default_values(i)</span>
+<span class="sd">          i must be an annotation name or index.  Returns the default</span>
+<span class="sd">          value of double annotation i.</span>
+
+<span class="sd">        double_annotations.get_default_values(seq)</span>
+<span class="sd">          seq must be a sequence of annotation names or indices.</span>
+<span class="sd">          Returns the default values of double annotations with names or</span>
+<span class="sd">          indices in s.  Equivalent to</span>
+<span class="sd">          [double_annotations.get_default_values(i) for i in s]</span>
+
+<span class="sd">        double_annotations.get_default_values(begin, end)</span>
+<span class="sd">          begin and end must be annotation indices or annotation names.</span>
+<span class="sd">          Returns the default values of double annotations with indices</span>
+<span class="sd">          between begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          double_annotations.get_default_values(list(range(begin, end + 1)))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx1 = c.double_annotations.add(name=&#39;ann1&#39;, defval=0.0)</span>
+<span class="sd">        &gt;&gt;&gt; idx2 = c.double_annotations.add(name=&#39;ann2&#39;, defval=1.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_default_values()</span>
+<span class="sd">        [0.0, 1.0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_getdefval</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getdblannodefval</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span>
+            <span class="n">_getdefval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.set_values">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.set_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">objtype</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the values for objects in the specified double annotation.</span>
+
+<span class="sd">        idx: the double annotation index or name.</span>
+
+<span class="sd">        objtype: the annotation object type.</span>
+
+<span class="sd">        Can be called by two forms:</span>
+
+<span class="sd">        double_annotations.set_values(idx, objtype, i, val)</span>
+<span class="sd">          i must be a name or index.  Changes the double annotation</span>
+<span class="sd">          value of the object identified by i.</span>
+
+<span class="sd">        double_annotations.set_values(idx, objtype, seq)</span>
+<span class="sd">          seq is a sequence of pairs (i, val) as described above.</span>
+<span class="sd">          Changes the double annotation values for the specified</span>
+<span class="sd">          objects.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.double_annotations.add(&#39;ann1&#39;, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.double_annotations.object_type.objective</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.set_values(idx, objtype, 0, 1.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_values(idx, objtype, 0)</span>
+<span class="sd">        1.0</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;v1&#39;, &#39;v2&#39;, &#39;v3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.double_annotations.object_type.variable</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.set_values(idx, objtype,</span>
+<span class="sd">        ...                                 [(i, 1.0) for i in indices])</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_values(idx, objtype)</span>
+<span class="sd">        [1.0, 1.0, 1.0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_set_values</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">setdblanno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">objtype</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">apply_pairs</span><span class="p">(</span><span class="n">_set_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleAnnotationInterface.get_values">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._anno.DoubleAnnotationInterface.get_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">objtype</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the double annotation values for the specified objects.</span>
+
+<span class="sd">        idx: the double annotation index or name.</span>
+
+<span class="sd">        objtype: the annotation object type.</span>
+
+<span class="sd">        Can be called by four forms:</span>
+
+<span class="sd">        double_annotations.get_values(idx, objtype)</span>
+<span class="sd">          return the values of all objects for a given annotation.</span>
+
+<span class="sd">        double_annotations.get_values(idx, objtype, i)</span>
+<span class="sd">          i must be a name or index.  Returns the double annotation</span>
+<span class="sd">          value of the object identified by i.</span>
+
+<span class="sd">        double_annotations.get_values(idx, objtype, seq)</span>
+<span class="sd">          seq is a sequence of object names or indices.  Returns the</span>
+<span class="sd">          double annotation values for the specified objects.</span>
+<span class="sd">          Equivalent to</span>
+<span class="sd">          [double_annotations.get_values(idx, objtype, i) for i in seq]</span>
+
+<span class="sd">        double_annotations.get_values(idx, objtype, begin, end)</span>
+<span class="sd">          begin and end must be object indices or object names. Returns</span>
+<span class="sd">          the double annotation values of objects with indices between</span>
+<span class="sd">          begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          double_annotations.get_values(range(begin, end + 1))</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; idx = c.double_annotations.add(&#39;ann1&#39;, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.double_annotations.object_type.objective</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.set_values(idx, objtype, 0, 1.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_values(idx, objtype, 0)</span>
+<span class="sd">        1.0</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[&#39;v1&#39;, &#39;v2&#39;, &#39;v3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; objtype = c.double_annotations.object_type.variable</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.set_values(idx, objtype,</span>
+<span class="sd">        ...                                 [(i, 1.0) for i in indices])</span>
+<span class="sd">        &gt;&gt;&gt; c.double_annotations.get_values(idx, objtype, list(indices))</span>
+<span class="sd">        [1.0, 1.0, 1.0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_values</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_getnumobjtype</span><span class="p">(</span><span class="n">objtype</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getdblanno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">objtype</span><span class="p">,</span>
+                                    <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_two_args</span><span class="p">(</span>
+            <span class="n">_get_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._anno</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

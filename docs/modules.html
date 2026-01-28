@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>cplex &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cplex package" href="cplex.html" />
+    <link rel="prev" title="CPLEX Python API Reference Manual" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cplex.html" title="cplex package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="CPLEX Python API Reference Manual"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="cplex">
+<h1>cplex<a class="headerlink" href="#cplex" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cplex.html">cplex package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.Cplex"><code class="docutils literal notranslate"><span class="pre">Cplex</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.problem_type"><code class="docutils literal notranslate"><span class="pre">Cplex.problem_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.__init__"><code class="docutils literal notranslate"><span class="pre">Cplex.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.parameters"><code class="docutils literal notranslate"><span class="pre">Cplex.parameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.variables"><code class="docutils literal notranslate"><span class="pre">Cplex.variables</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.linear_constraints"><code class="docutils literal notranslate"><span class="pre">Cplex.linear_constraints</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.quadratic_constraints"><code class="docutils literal notranslate"><span class="pre">Cplex.quadratic_constraints</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.indicator_constraints"><code class="docutils literal notranslate"><span class="pre">Cplex.indicator_constraints</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.SOS"><code class="docutils literal notranslate"><span class="pre">Cplex.SOS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.objective"><code class="docutils literal notranslate"><span class="pre">Cplex.objective</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.multiobj"><code class="docutils literal notranslate"><span class="pre">Cplex.multiobj</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.MIP_starts"><code class="docutils literal notranslate"><span class="pre">Cplex.MIP_starts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.solution"><code class="docutils literal notranslate"><span class="pre">Cplex.solution</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.presolve"><code class="docutils literal notranslate"><span class="pre">Cplex.presolve</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.order"><code class="docutils literal notranslate"><span class="pre">Cplex.order</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.conflict"><code class="docutils literal notranslate"><span class="pre">Cplex.conflict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.advanced"><code class="docutils literal notranslate"><span class="pre">Cplex.advanced</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.start"><code class="docutils literal notranslate"><span class="pre">Cplex.start</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.feasopt"><code class="docutils literal notranslate"><span class="pre">Cplex.feasopt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.long_annotations"><code class="docutils literal notranslate"><span class="pre">Cplex.long_annotations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.double_annotations"><code class="docutils literal notranslate"><span class="pre">Cplex.double_annotations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.pwl_constraints"><code class="docutils literal notranslate"><span class="pre">Cplex.pwl_constraints</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.end"><code class="docutils literal notranslate"><span class="pre">Cplex.end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.__del__"><code class="docutils literal notranslate"><span class="pre">Cplex.__del__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.__enter__"><code class="docutils literal notranslate"><span class="pre">Cplex.__enter__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.__exit__"><code class="docutils literal notranslate"><span class="pre">Cplex.__exit__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.read"><code class="docutils literal notranslate"><span class="pre">Cplex.read()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.write"><code class="docutils literal notranslate"><span class="pre">Cplex.write()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.write_to_stream"><code class="docutils literal notranslate"><span class="pre">Cplex.write_to_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.write_as_string"><code class="docutils literal notranslate"><span class="pre">Cplex.write_as_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.read_annotations"><code class="docutils literal notranslate"><span class="pre">Cplex.read_annotations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.write_annotations"><code class="docutils literal notranslate"><span class="pre">Cplex.write_annotations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.write_benders_annotation"><code class="docutils literal notranslate"><span class="pre">Cplex.write_benders_annotation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_problem_type"><code class="docutils literal notranslate"><span class="pre">Cplex.get_problem_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_problem_type"><code class="docutils literal notranslate"><span class="pre">Cplex.set_problem_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.solve"><code class="docutils literal notranslate"><span class="pre">Cplex.solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.runseeds"><code class="docutils literal notranslate"><span class="pre">Cplex.runseeds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.populate_solution_pool"><code class="docutils literal notranslate"><span class="pre">Cplex.populate_solution_pool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_problem_name"><code class="docutils literal notranslate"><span class="pre">Cplex.get_problem_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_problem_name"><code class="docutils literal notranslate"><span class="pre">Cplex.set_problem_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.cleanup"><code class="docutils literal notranslate"><span class="pre">Cplex.cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.register_callback"><code class="docutils literal notranslate"><span class="pre">Cplex.register_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.unregister_callback"><code class="docutils literal notranslate"><span class="pre">Cplex.unregister_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_results_stream"><code class="docutils literal notranslate"><span class="pre">Cplex.set_results_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_warning_stream"><code class="docutils literal notranslate"><span class="pre">Cplex.set_warning_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_error_stream"><code class="docutils literal notranslate"><span class="pre">Cplex.set_error_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_log_stream"><code class="docutils literal notranslate"><span class="pre">Cplex.set_log_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_version"><code class="docutils literal notranslate"><span class="pre">Cplex.get_version()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_versionnumber"><code class="docutils literal notranslate"><span class="pre">Cplex.get_versionnumber()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_num_cores"><code class="docutils literal notranslate"><span class="pre">Cplex.get_num_cores()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_stats"><code class="docutils literal notranslate"><span class="pre">Cplex.get_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_time"><code class="docutils literal notranslate"><span class="pre">Cplex.get_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_dettime"><code class="docutils literal notranslate"><span class="pre">Cplex.get_dettime()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.use_aborter"><code class="docutils literal notranslate"><span class="pre">Cplex.use_aborter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.remove_aborter"><code class="docutils literal notranslate"><span class="pre">Cplex.remove_aborter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_aborter"><code class="docutils literal notranslate"><span class="pre">Cplex.get_aborter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_callback"><code class="docutils literal notranslate"><span class="pre">Cplex.set_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_modeling_assistance_callback"><code class="docutils literal notranslate"><span class="pre">Cplex.set_modeling_assistance_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.create_parameter_set"><code class="docutils literal notranslate"><span class="pre">Cplex.create_parameter_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.copy_parameter_set"><code class="docutils literal notranslate"><span class="pre">Cplex.copy_parameter_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.get_parameter_set"><code class="docutils literal notranslate"><span class="pre">Cplex.get_parameter_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.set_parameter_set"><code class="docutils literal notranslate"><span class="pre">Cplex.set_parameter_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Cplex.copylp"><code class="docutils literal notranslate"><span class="pre">Cplex.copylp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.Stats"><code class="docutils literal notranslate"><span class="pre">Stats</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Stats.__init__"><code class="docutils literal notranslate"><span class="pre">Stats.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Stats.__str__"><code class="docutils literal notranslate"><span class="pre">Stats.__str__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.Aborter"><code class="docutils literal notranslate"><span class="pre">Aborter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.__init__"><code class="docutils literal notranslate"><span class="pre">Aborter.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.abort"><code class="docutils literal notranslate"><span class="pre">Aborter.abort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.clear"><code class="docutils literal notranslate"><span class="pre">Aborter.clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.is_aborted"><code class="docutils literal notranslate"><span class="pre">Aborter.is_aborted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.end"><code class="docutils literal notranslate"><span class="pre">Aborter.end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.__enter__"><code class="docutils literal notranslate"><span class="pre">Aborter.__enter__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.Aborter.__exit__"><code class="docutils literal notranslate"><span class="pre">Aborter.__exit__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.infinity"><code class="docutils literal notranslate"><span class="pre">infinity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.ParameterSet"><code class="docutils literal notranslate"><span class="pre">ParameterSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.__init__"><code class="docutils literal notranslate"><span class="pre">ParameterSet.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.end"><code class="docutils literal notranslate"><span class="pre">ParameterSet.end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.__del__"><code class="docutils literal notranslate"><span class="pre">ParameterSet.__del__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.__enter__"><code class="docutils literal notranslate"><span class="pre">ParameterSet.__enter__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.__exit__"><code class="docutils literal notranslate"><span class="pre">ParameterSet.__exit__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.add"><code class="docutils literal notranslate"><span class="pre">ParameterSet.add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.get"><code class="docutils literal notranslate"><span class="pre">ParameterSet.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.get_ids"><code class="docutils literal notranslate"><span class="pre">ParameterSet.get_ids()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.delete"><code class="docutils literal notranslate"><span class="pre">ParameterSet.delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.clear"><code class="docutils literal notranslate"><span class="pre">ParameterSet.clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.__len__"><code class="docutils literal notranslate"><span class="pre">ParameterSet.__len__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.read"><code class="docutils literal notranslate"><span class="pre">ParameterSet.read()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.ParameterSet.write"><code class="docutils literal notranslate"><span class="pre">ParameterSet.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.SparsePair"><code class="docutils literal notranslate"><span class="pre">SparsePair</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparsePair.__init__"><code class="docutils literal notranslate"><span class="pre">SparsePair.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparsePair.__repr__"><code class="docutils literal notranslate"><span class="pre">SparsePair.__repr__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparsePair.isvalid"><code class="docutils literal notranslate"><span class="pre">SparsePair.isvalid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparsePair.unpack"><code class="docutils literal notranslate"><span class="pre">SparsePair.unpack()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#cplex.SparseTriple"><code class="docutils literal notranslate"><span class="pre">SparseTriple</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparseTriple.__init__"><code class="docutils literal notranslate"><span class="pre">SparseTriple.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparseTriple.__repr__"><code class="docutils literal notranslate"><span class="pre">SparseTriple.__repr__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparseTriple.isvalid"><code class="docutils literal notranslate"><span class="pre">SparseTriple.isvalid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#cplex.SparseTriple.unpack"><code class="docutils literal notranslate"><span class="pre">SparseTriple.unpack()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex._internal.html">cplex._internal package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex._internal.html#cplex._internal.Environment"><code class="docutils literal notranslate"><span class="pre">Environment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex._internal.html#cplex._internal.ProblemType"><code class="docutils literal notranslate"><span class="pre">ProblemType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex._internal.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#module-cplex.aborter">cplex.aborter module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.aborter.Aborter"><code class="docutils literal notranslate"><span class="pre">Aborter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#module-cplex.callbacks">cplex.callbacks module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.Callback"><code class="docutils literal notranslate"><span class="pre">Callback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.OptimizationCallback"><code class="docutils literal notranslate"><span class="pre">OptimizationCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.ContinuousCallback"><code class="docutils literal notranslate"><span class="pre">ContinuousCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.SimplexCallback"><code class="docutils literal notranslate"><span class="pre">SimplexCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.BarrierCallback"><code class="docutils literal notranslate"><span class="pre">BarrierCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.CrossoverCallback"><code class="docutils literal notranslate"><span class="pre">CrossoverCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.QualityMetric"><code class="docutils literal notranslate"><span class="pre">QualityMetric</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.CutType"><code class="docutils literal notranslate"><span class="pre">CutType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.MIPInfoCallback"><code class="docutils literal notranslate"><span class="pre">MIPInfoCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.MIPCallback"><code class="docutils literal notranslate"><span class="pre">MIPCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.FeasibilityStatus"><code class="docutils literal notranslate"><span class="pre">FeasibilityStatus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.ControlCallback"><code class="docutils literal notranslate"><span class="pre">ControlCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.BranchType"><code class="docutils literal notranslate"><span class="pre">BranchType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.BranchCallback"><code class="docutils literal notranslate"><span class="pre">BranchCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.CutCallback"><code class="docutils literal notranslate"><span class="pre">CutCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.UseConstraint"><code class="docutils literal notranslate"><span class="pre">UseConstraint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.LazyConstraintCallback"><code class="docutils literal notranslate"><span class="pre">LazyConstraintCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.UseCut"><code class="docutils literal notranslate"><span class="pre">UseCut</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.UserCutCallback"><code class="docutils literal notranslate"><span class="pre">UserCutCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.MethodType"><code class="docutils literal notranslate"><span class="pre">MethodType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.HSCallback"><code class="docutils literal notranslate"><span class="pre">HSCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.HeuristicCallback"><code class="docutils literal notranslate"><span class="pre">HeuristicCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.SolveCallback"><code class="docutils literal notranslate"><span class="pre">SolveCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.SolutionSource"><code class="docutils literal notranslate"><span class="pre">SolutionSource</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.IncumbentCallback"><code class="docutils literal notranslate"><span class="pre">IncumbentCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.NodeCallback"><code class="docutils literal notranslate"><span class="pre">NodeCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.TuningCallback"><code class="docutils literal notranslate"><span class="pre">TuningCallback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.ContextType"><code class="docutils literal notranslate"><span class="pre">ContextType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.RelaxationFlags"><code class="docutils literal notranslate"><span class="pre">RelaxationFlags</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.callbacks.Context"><code class="docutils literal notranslate"><span class="pre">Context</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#module-cplex.constant_class">cplex.constant_class module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.constant_class.ConstantClass"><code class="docutils literal notranslate"><span class="pre">ConstantClass</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#module-cplex.exceptions">cplex.exceptions module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.exceptions.CplexError"><code class="docutils literal notranslate"><span class="pre">CplexError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.exceptions.CplexSolverError"><code class="docutils literal notranslate"><span class="pre">CplexSolverError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.exceptions.WrongNumberOfArgumentsError"><code class="docutils literal notranslate"><span class="pre">WrongNumberOfArgumentsError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.exceptions.ErrorChannelMessage"><code class="docutils literal notranslate"><span class="pre">ErrorChannelMessage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#module-cplex.model_info">cplex.model_info module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_BIGM_COEF"><code class="docutils literal notranslate"><span class="pre">CPXMI_BIGM_COEF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_BIGM_TO_IND"><code class="docutils literal notranslate"><span class="pre">CPXMI_BIGM_TO_IND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_BIGM_VARBOUND"><code class="docutils literal notranslate"><span class="pre">CPXMI_BIGM_VARBOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_CANCEL_TOL"><code class="docutils literal notranslate"><span class="pre">CPXMI_CANCEL_TOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_EPGAP_LARGE"><code class="docutils literal notranslate"><span class="pre">CPXMI_EPGAP_LARGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_EPGAP_OBJOFFSET"><code class="docutils literal notranslate"><span class="pre">CPXMI_EPGAP_OBJOFFSET</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_FEAS_TOL"><code class="docutils literal notranslate"><span class="pre">CPXMI_FEAS_TOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_FRACTION_SCALING"><code class="docutils literal notranslate"><span class="pre">CPXMI_FRACTION_SCALING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_IND_NZ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_IND_NZ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_IND_NZ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_IND_NZ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_IND_RHS_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_IND_RHS_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_IND_RHS_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_IND_RHS_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_KAPPA_ILLPOSED"><code class="docutils literal notranslate"><span class="pre">CPXMI_KAPPA_ILLPOSED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_KAPPA_SUSPICIOUS"><code class="docutils literal notranslate"><span class="pre">CPXMI_KAPPA_SUSPICIOUS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_KAPPA_UNSTABLE"><code class="docutils literal notranslate"><span class="pre">CPXMI_KAPPA_UNSTABLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_LB_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_LB_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_LB_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_LB_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_LC_NZ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_LC_NZ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_LC_NZ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_LC_NZ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_LC_RHS_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_LC_RHS_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_LC_RHS_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_LC_RHS_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_MULTIOBJ_COEFFS"><code class="docutils literal notranslate"><span class="pre">CPXMI_MULTIOBJ_COEFFS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_MULTIOBJ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_MULTIOBJ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_MULTIOBJ_MIX"><code class="docutils literal notranslate"><span class="pre">CPXMI_MULTIOBJ_MIX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_MULTIOBJ_OPT_TOL"><code class="docutils literal notranslate"><span class="pre">CPXMI_MULTIOBJ_OPT_TOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_MULTIOBJ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_MULTIOBJ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_NZ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_NZ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_NZ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_NZ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_OBJ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_OBJ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_OBJ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_OBJ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_OPT_TOL"><code class="docutils literal notranslate"><span class="pre">CPXMI_OPT_TOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_PWL_SLOPE_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_PWL_SLOPE_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_PWL_SLOPE_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_PWL_SLOPE_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QC_LINNZ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QC_LINNZ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QC_LINNZ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QC_LINNZ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QC_QNZ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QC_QNZ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QC_QNZ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QC_QNZ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QC_RHS_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QC_RHS_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QC_RHS_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QC_RHS_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QOBJ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QOBJ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QOBJ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_QOBJ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_QOPT_TOL"><code class="docutils literal notranslate"><span class="pre">CPXMI_QOPT_TOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_RHS_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_RHS_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_RHS_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_RHS_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_COL"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_COL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_IND"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_IND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_LAZY"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_LAZY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_MULTIOBJ"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_MULTIOBJ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_OBJ"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_OBJ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_QLIN"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_QLIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_QUAD"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_QUAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_RHS"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_RHS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_ROW"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_ROW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SAMECOEFF_UCUT"><code class="docutils literal notranslate"><span class="pre">CPXMI_SAMECOEFF_UCUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SINGLE_PRECISION"><code class="docutils literal notranslate"><span class="pre">CPXMI_SINGLE_PRECISION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_SYMMETRY_BREAKING_INEQ"><code class="docutils literal notranslate"><span class="pre">CPXMI_SYMMETRY_BREAKING_INEQ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_UB_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_UB_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_UB_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_UB_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_UC_NZ_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_UC_NZ_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_UC_NZ_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_UC_NZ_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_UC_RHS_LARGE_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_UC_RHS_LARGE_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_UC_RHS_SMALL_NUM"><code class="docutils literal notranslate"><span class="pre">CPXMI_UC_RHS_SMALL_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.model_info.CPXMI_WIDE_COEFF_RANGE"><code class="docutils literal notranslate"><span class="pre">CPXMI_WIDE_COEFF_RANGE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cplex.html#module-cplex.paramset">cplex.paramset module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cplex.html#cplex.paramset.ParameterSet"><code class="docutils literal notranslate"><span class="pre">ParameterSet</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cplex</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cplex.html">cplex package</a></li>
+</ul>
+</li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">CPLEX Python API Reference Manual</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="cplex.html"
+                          title="next chapter">cplex package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cplex.html" title="cplex package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="CPLEX Python API Reference Manual"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

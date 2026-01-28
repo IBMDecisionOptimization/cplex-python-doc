@@ -1,0 +1,4 @@
+<map id="inheritancee7bea41c6d" name="inheritancee7bea41c6d">
+<area shape="rect" id="node1" href="#cplex._internal._parameter_classes.Parameter" target="_top" title="Base class for Cplex parameters." alt="" coords="14,5,95,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._parameter_classes.StrParameter" target="_top" title="Class for string parameters." alt="" coords="5,80,104,107"/>
+</map>

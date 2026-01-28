@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex.aborter &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cplex.html" accesskey="U">cplex</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex.aborter</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex.aborter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: aborter.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Aborter API&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">_proc</span>
+
+
+<div class="viewcode-block" id="Aborter">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Aborter</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gracefully terminates the solve and tuning methods of CPLEX.</span>
+
+<span class="sd">    You can pass an instance of this class to one or more Cplex objects.</span>
+
+<span class="sd">    Calling the method abort() will then terminate the solve or tuning</span>
+<span class="sd">    method of the Cplex object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Aborter.__init__">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the Aborter class.</span>
+
+<span class="sd">        The Aborter object is a context manager and can be used, like so:</span>
+
+<span class="sd">        with Aborter() as aborter:</span>
+<span class="sd">            # do stuff</span>
+
+<span class="sd">        When the with block is finished, the end() method will be called</span>
+<span class="sd">        automatically.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">_proc</span><span class="o">.</span><span class="n">new_native_int</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpxlst</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpxlst</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cpx</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpxlst</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">cpx</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_throw_if_disposed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;illegal method invocation after Aborter.end()&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Aborter.abort">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.abort">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Aborts the solving and tuning methods.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; aborter = cplex.Aborter()</span>
+<span class="sd">        &gt;&gt;&gt; aborter.abort()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">set_native_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Aborter.clear">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clears the invoking aborter.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; aborter = cplex.Aborter()</span>
+<span class="sd">        &gt;&gt;&gt; aborter.clear()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">set_native_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Aborter.is_aborted">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.is_aborted">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_aborted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if the method to abort has been called.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; aborter = cplex.Aborter()</span>
+<span class="sd">        &gt;&gt;&gt; aborter.is_aborted()</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">get_native_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="Aborter.end">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.end">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ends the invoking aborter.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; aborter = cplex.Aborter()</span>
+<span class="sd">        &gt;&gt;&gt; aborter.end()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpxlst</span><span class="p">:</span>
+            <span class="n">cpx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpxlst</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">cpx</span><span class="o">.</span><span class="n">remove_aborter</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">delete_native_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Aborter.__enter__">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.__enter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enter the runtime context related to this object.</span>
+
+<span class="sd">        The with statement will bind this method&#39;s return value to the</span>
+<span class="sd">        target specified in the as clause of the statement, if any.</span>
+
+<span class="sd">        Aborter objects return themselves.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="Aborter.__exit__">
+<a class="viewcode-back" href="../../cplex.html#cplex.Aborter.__exit__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exit the runtime context.</span>
+
+<span class="sd">        When we exit the with block, the end() method is called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cplex.html" >cplex</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex.aborter</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

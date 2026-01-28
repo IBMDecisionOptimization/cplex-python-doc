@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cplex.html" accesskey="U">cplex</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: __init__.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">   :undocumented: Environment, _aux_functions, _list_array_utils, _ostream</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_aux_functions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_baseinterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_list_array_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ostream</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_matrices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_multiobj</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_multiobjsoln</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_parameter_classes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_parameter_hierarchy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_subinterfaces</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_pycplex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_parameters_auto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_anno</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_pwl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_constantsenum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_callbackinfoenum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_solutionstrategyenum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">CplexError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constant_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantClass</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Environment&quot;</span><span class="p">,</span> <span class="s2">&quot;_aux_functions&quot;</span><span class="p">,</span> <span class="s2">&quot;_baseinterface&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;_list_array_utils&quot;</span><span class="p">,</span> <span class="s2">&quot;_ostream&quot;</span><span class="p">,</span> <span class="s2">&quot;_procedural&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;_constants&quot;</span><span class="p">,</span> <span class="s2">&quot;_matrices&quot;</span><span class="p">,</span> <span class="s2">&quot;_multiobj&quot;</span><span class="p">,</span> <span class="s2">&quot;_multiobjsoln&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;_parameter_classes&quot;</span><span class="p">,</span> <span class="s2">&quot;_subinterfaces&quot;</span><span class="p">,</span> <span class="s2">&quot;_pycplex&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;_parameters_auto&quot;</span><span class="p">,</span> <span class="s2">&quot;_anno&quot;</span><span class="p">,</span> <span class="s2">&quot;_pwl&quot;</span><span class="p">,</span> <span class="s2">&quot;ProblemType&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;_constantsenum&quot;</span><span class="p">,</span> <span class="s2">&quot;_constants&quot;</span><span class="p">,</span> <span class="s2">&quot;_callbackinfoenum&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;_solutionstrategyenum&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="ProblemType">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.ProblemType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProblemType</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of problems the Cplex object can encapsulate.</span>
+
+<span class="sd">    For explanations of the problem types, see those topics in the</span>
+<span class="sd">    CPLEX User&#39;s Manual in the topic titled Continuous Optimization</span>
+<span class="sd">    for LP, QP, and QCP or the topic titled Discrete Optimization</span>
+<span class="sd">    for MILP, FIXEDMILP, NODELP, NODEQP, MIQCP, NODEQCP.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_LP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_LP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">MILP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_MILP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_MILP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">fixed_MILP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_FIXEDMILP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_FIXEDMILP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">node_LP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_NODELP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_NODELP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">QP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_QP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_QP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">MIQP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_MIQP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_MIQP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">fixed_MIQP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_FIXEDMIQP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_MIQP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">node_QP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_NODEQP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_NODEQP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">QCP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_QCP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_QCP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">MIQCP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_MIQCP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_MIQCP in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">node_QCP</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXPROB_NODEQCP</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXPROB_QCP in the C API.&quot;&quot;&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_needs_delete_callback</span><span class="p">(</span><span class="n">callback_instance</span><span class="p">):</span>
+    <span class="c1"># If the user has registered any callback that may change</span>
+    <span class="c1"># the user data at a node then we need to register the</span>
+    <span class="c1"># delete callback.</span>
+    <span class="c1"># The Control, Node, and Incumbent callbacks have the set_node_data</span>
+    <span class="c1"># method (and all who inherit from these).</span>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">callback_instance</span><span class="p">,</span> <span class="s2">&quot;set_node_data&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_getcbattrname</span><span class="p">(</span><span class="n">cb_type_string</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the attribute name to be used to store the callback</span>
+<span class="sd">    instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;_</span><span class="si">{0}</span><span class="s2">_callback&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cb_type_string</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_checkcbcls</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks callback class instance for expected attribute.</span>
+
+<span class="sd">    Raises a CplexError if it is not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_cb_type_string&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CplexError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">+</span>
+                         <span class="s2">&quot; is not a subclass of a subclassable Callback class.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Environment">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Environment</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+    <span class="n">RESULTS_CHNL_IDX</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">WARNING_CHNL_IDX</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ERROR_CHNL_IDX</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">LOG_CHNL_IDX</span> <span class="o">=</span> <span class="mi">3</span>
+
+<div class="viewcode-block" id="Environment.__init__">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="c1"># Declare and initialize attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">RESULTS_CHNL_IDX</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">WARNING_CHNL_IDX</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">ERROR_CHNL_IDX</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">LOG_CHNL_IDX</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callback_exception</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Initialize data strucutures associated with CPLEX</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_e</span> <span class="o">=</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">openCPLEX</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">_parameter_classes</span><span class="o">.</span><span class="n">RootParameterGroup</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">_parameter_hierarchy</span><span class="o">.</span><span class="n">root_members</span><span class="p">)</span>
+        <span class="n">_procedural</span><span class="o">.</span><span class="n">set_status_checker</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">initlock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_results_stream</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_warning_stream</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_error_stream</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_log_stream</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Frees all of the data structures associated with CPLEX.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">chnl_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delete_stream</span><span class="p">(</span><span class="n">chnl_idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">:</span>
+            <span class="n">_procedural</span><span class="o">.</span><span class="n">finitlock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">:</span>
+            <span class="n">_procedural</span><span class="o">.</span><span class="n">closeCPLEX</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_e</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Environment.__del__">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.__del__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_num_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Count the callbacks that are installed and require a delete</span>
+<span class="sd">        callback.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span>
+                   <span class="k">if</span> <span class="n">_needs_delete_callback</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Environment.register_callback">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.register_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_class</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Registers a callback for use when solving.</span>
+
+<span class="sd">        callback_class must be a proper subclass of one of the</span>
+<span class="sd">        callback classes defined in the module callbacks.  It must</span>
+<span class="sd">        override the __call__ method with a method that has signature</span>
+<span class="sd">        __call__(self) -&gt; None.  If callback_class is a subclass of</span>
+<span class="sd">        more than one callback class, it will only be called when its</span>
+<span class="sd">        first superclass is called.  register_callback returns the</span>
+<span class="sd">        instance of callback_class registered for use.  Any previously</span>
+<span class="sd">        registered callback of the same class will no longer be</span>
+<span class="sd">        registered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb</span> <span class="o">=</span> <span class="n">callback_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">_checkcbcls</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span>
+        <span class="n">num_delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_num_delete</span><span class="p">()</span>
+        <span class="n">old_cb</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">_getcbattrname</span><span class="p">(</span><span class="n">cb</span><span class="o">.</span><span class="n">_cb_type_string</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_cb</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">old_cb</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_getcbattrname</span><span class="p">(</span><span class="n">cb</span><span class="o">.</span><span class="n">_cb_type_string</span><span class="p">),</span> <span class="n">cb</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cb</span><span class="o">.</span><span class="n">_cb_type_string</span> <span class="o">==</span> <span class="s2">&quot;MIP_info&quot;</span><span class="p">:</span>
+            <span class="c1"># self._MIP_info_callback is set above with the call to</span>
+            <span class="c1"># setattr. So, we are passing the callback instance as the</span>
+            <span class="c1"># second argument here rather than the environment</span>
+            <span class="c1"># (i.e., self).</span>
+            <span class="c1"># pylint: disable=no-member</span>
+            <span class="n">cb</span><span class="o">.</span><span class="n">_cb_set_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MIP_info_callback</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cb</span><span class="o">.</span><span class="n">_cb_set_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_needs_delete_callback</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_delete</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># We need a delete callback and did not have one</span>
+            <span class="c1"># before -&gt; install it.</span>
+            <span class="n">_procedural</span><span class="o">.</span><span class="n">setpydel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cb</span></div>
+
+
+<div class="viewcode-block" id="Environment.unregister_callback">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.unregister_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unregister_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_class</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unregisters a callback.</span>
+
+<span class="sd">        callback_class must be one of the callback classes defined in</span>
+<span class="sd">        the module callback or a subclass of one of them.  This method</span>
+<span class="sd">        unregisters any previously registered callback of the same</span>
+<span class="sd">        class.  If callback_class is a subclass of more than one</span>
+<span class="sd">        callback class, this method unregisters only the callback of the</span>
+<span class="sd">        same type as its first superclass.  unregister_callback</span>
+<span class="sd">        returns the instance of callback_class just unregistered.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb</span> <span class="o">=</span> <span class="n">callback_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">_checkcbcls</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span>
+        <span class="n">current_cb</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">_getcbattrname</span><span class="p">(</span><span class="n">cb</span><span class="o">.</span><span class="n">_cb_type_string</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_cb</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">_needs_delete_callback</span><span class="p">(</span><span class="n">current_cb</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_num_delete</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="c1"># We are about to remove the last callback that requires</span>
+                <span class="c1"># a delete callback.</span>
+                <span class="n">_procedural</span><span class="o">.</span><span class="n">delpydel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span>
+            <span class="n">current_cb</span><span class="o">.</span><span class="n">_cb_set_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">current_cb</span><span class="p">)</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_getcbattrname</span><span class="p">(</span><span class="n">current_cb</span><span class="o">.</span><span class="n">_cb_type_string</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">current_cb</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which_channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">getchannels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)[</span><span class="n">which_channel</span><span class="p">]</span>
+        <span class="n">_procedural</span><span class="o">.</span><span class="n">addfuncdest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">which_channel</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delete_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which_channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">which_channel</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">getchannels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)[</span><span class="n">which_channel</span><span class="p">]</span>
+        <span class="n">_procedural</span><span class="o">.</span><span class="n">delfuncdest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">which_channel</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">which_channel</span><span class="p">]</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initerrstr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete_stream</span><span class="p">(</span><span class="n">which</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">which</span><span class="p">]</span> <span class="o">=</span> <span class="n">_ostream</span><span class="o">.</span><span class="n">OutputStream</span><span class="p">(</span>
+            <span class="n">outputfile</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">initerrorstr</span><span class="o">=</span><span class="n">initerrstr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_stream</span><span class="p">(</span><span class="n">which</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">which</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Environment.set_results_stream">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.set_results_stream">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_results_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results_file</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Specifies where results will be printed.</span>
+
+<span class="sd">        The first argument must be either a file-like object (that is, an</span>
+<span class="sd">        object with a write method and a flush method) or the name of</span>
+<span class="sd">        a file to be written to (the later is deprecated since V12.9.0).</span>
+<span class="sd">        Use None as the first argument to suppress output.</span>
+
+<span class="sd">        The second optional argument is a function that takes a string</span>
+<span class="sd">        as input and returns a string.  If specified, strings sent to</span>
+<span class="sd">        this stream will be processed by this function before being</span>
+<span class="sd">        written.</span>
+
+<span class="sd">        Returns the stream to which results will be written.  To write</span>
+<span class="sd">        to this stream, use the write() method of this object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_stream</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">RESULTS_CHNL_IDX</span><span class="p">,</span>
+                                <span class="n">outputfile</span><span class="o">=</span><span class="n">results_file</span><span class="p">,</span>
+                                <span class="n">func</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+                                <span class="n">initerrstr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.set_warning_stream">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.set_warning_stream">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_warning_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">warning_file</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Specifies where warnings will be printed.</span>
+
+<span class="sd">        The first argument must be either a file-like object (that is, an</span>
+<span class="sd">        object with a write method and a flush method) or the name of</span>
+<span class="sd">        a file to be written to (the later is deprecated since V12.9.0).</span>
+<span class="sd">        Use None as the first argument to suppress output.</span>
+
+<span class="sd">        The second optional argument is a function that takes a string</span>
+<span class="sd">        as input and returns a string.  If specified, strings sent to</span>
+<span class="sd">        this stream will be processed by this function before being</span>
+<span class="sd">        written.</span>
+
+<span class="sd">        Returns the stream to which warnings will be written.  To write</span>
+<span class="sd">        to this stream, use the write() method of this object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_stream</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">WARNING_CHNL_IDX</span><span class="p">,</span>
+                                <span class="n">outputfile</span><span class="o">=</span><span class="n">warning_file</span><span class="p">,</span>
+                                <span class="n">func</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+                                <span class="n">initerrstr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.set_error_stream">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.set_error_stream">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_error_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_file</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Specifies where errors will be printed.</span>
+
+<span class="sd">        The first argument must be either a file-like object (that is, an</span>
+<span class="sd">        object with a write method and a flush method) or the name of</span>
+<span class="sd">        a file to be written to (the later is deprecated since V12.9.0).</span>
+<span class="sd">        Use None as the first argument to suppress output.</span>
+
+<span class="sd">        The second optional argument is a function that takes a string</span>
+<span class="sd">        as input and returns a string.  If specified, strings sent to</span>
+<span class="sd">        this stream will be processed by this function before being</span>
+<span class="sd">        written.</span>
+
+<span class="sd">        Returns the stream to which errors will be written.  To write</span>
+<span class="sd">        to this stream, use the write() method of this object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_stream</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ERROR_CHNL_IDX</span><span class="p">,</span>
+                                <span class="n">outputfile</span><span class="o">=</span><span class="n">error_file</span><span class="p">,</span>
+                                <span class="n">func</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+                                <span class="n">initerrstr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.set_log_stream">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.set_log_stream">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_log_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Specifies where the log will be printed.</span>
+
+<span class="sd">        The first argument must be either a file-like object (that is, an</span>
+<span class="sd">        object with a write method and a flush method) or the name of</span>
+<span class="sd">        a file to be written to (the later is deprecated since V12.9.0).</span>
+<span class="sd">        Use None as the first argument to suppress output.</span>
+
+<span class="sd">        The second optional argument is a function that takes a string</span>
+<span class="sd">        as input and returns a string.  If specified, strings sent to</span>
+<span class="sd">        this stream will be processed by this function before being</span>
+<span class="sd">        written.</span>
+
+<span class="sd">        Returns the stream to which the log will be written.  To write</span>
+<span class="sd">        to this stream, use this object&#39;s write() method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_stream</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">LOG_CHNL_IDX</span><span class="p">,</span>
+                                <span class="n">outputfile</span><span class="o">=</span><span class="n">log_file</span><span class="p">,</span>
+                                <span class="n">func</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+                                <span class="n">initerrstr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_results_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public.  Nice for unit tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">RESULTS_CHNL_IDX</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_warning_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public.  Nice for unit tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">WARNING_CHNL_IDX</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_error_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public.  Nice for unit tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ERROR_CHNL_IDX</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_log_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public.  Nice for unit tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">LOG_CHNL_IDX</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Environment.get_version">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.get_version">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string specifying the version of CPLEX.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.get_versionnumber">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.get_versionnumber">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_versionnumber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an integer specifying the version of CPLEX.</span>
+
+<span class="sd">        The version of CPLEX is in the format vvrrmmff, where vv is</span>
+<span class="sd">        the version, rr is the release, mm is the modification, and ff</span>
+<span class="sd">        is the fixpack number. For example, for CPLEX version 12.5.0.1</span>
+<span class="sd">        the returned value is 12050001.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">versionnumber</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.get_num_cores">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.get_num_cores">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of cores on this machine.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">getnumcores</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.get_time">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.get_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a timestamp in CPU or wallclock seconds from CPLEX.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">gettime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Environment.get_dettime">
+<a class="viewcode-back" href="../../cplex._internal.html#cplex._internal.Environment.get_dettime">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dettime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current deterministic time in ticks.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_procedural</span><span class="o">.</span><span class="n">getdettime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cplex.html" >cplex</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

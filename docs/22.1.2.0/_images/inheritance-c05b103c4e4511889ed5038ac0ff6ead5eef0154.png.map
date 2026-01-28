@@ -1,0 +1,4 @@
+<map id="inheritancebd6c9fcb54" name="inheritancebd6c9fcb54">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="14,5,116,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.SolutionInterface" target="_top" title="Methods for querying the solution to an optimization problem." alt="" coords="5,80,125,107"/>
+</map>

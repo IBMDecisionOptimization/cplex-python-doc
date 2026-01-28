@@ -1,0 +1,4 @@
+<map id="inheritance8b481cf3ed" name="inheritance8b481cf3ed">
+<area shape="rect" id="node1" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.QualityMetric" target="_top" title="Constants defining metrics for the quality of the MIP solve." alt="" coords="10,80,109,107"/>
+</map>

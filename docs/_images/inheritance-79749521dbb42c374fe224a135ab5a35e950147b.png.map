@@ -1,0 +1,4 @@
+<map id="inheritancec5ba4988d4" name="inheritancec5ba4988d4">
+<area shape="rect" id="node1" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.UseConstraint" target="_top" title="Constants to specify when to use the added constraint" alt="" coords="7,80,112,107"/>
+</map>

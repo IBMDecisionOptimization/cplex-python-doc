@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex.paramset &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cplex.html" accesskey="U">cplex</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex.paramset</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex.paramset</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: paramset.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;ParameterSet API&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">_proc</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_id</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a parameter ID.</span>
+
+<span class="sd">    If param is a Parameter object, then we get the ID from it.</span>
+<span class="sd">    Otherwise, we assume param is an integer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># If this is a Parameter object, then return its _id attr.</span>
+        <span class="k">return</span> <span class="n">param</span><span class="o">.</span><span class="n">_id</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="c1"># Otherwise, we assume it&#39;s an integer.</span>
+        <span class="k">return</span> <span class="n">param</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_type</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a parameter type.</span>
+
+<span class="sd">    If param is a Parameter object, then we get the type from it.</span>
+<span class="sd">    Otherwise, we assume param is an integer and query the parameter</span>
+<span class="sd">    type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">param</span><span class="o">.</span><span class="n">_type</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getparamtype</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParameterSet">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParameterSet</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A parameter set object for use with multi-objective optimization.</span>
+
+<span class="sd">    A parameter set consists of key-value pairs where the key is a CPLEX</span>
+<span class="sd">    parameter ID (e.g., CPX_PARAM_ADVIND) and the value is the associated</span>
+<span class="sd">    parameter value.</span>
+
+<span class="sd">    When adding, getting, or deleting items from a parameter set the</span>
+<span class="sd">    param argument can be either a Parameter object (e.g,</span>
+<span class="sd">    Cplex.parameters.advance) or an integer ID (e.g., CPX_PARAM_ADVIND</span>
+<span class="sd">    (1001)).</span>
+
+<span class="sd">    For more details see the section on multi-objective optimization in</span>
+<span class="sd">    the CPLEX User&#39;s Manual.</span>
+
+<span class="sd">    See `Cplex.create_parameter_set` and `Cplex.copy_parameter_set`.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; import cplex</span>
+<span class="sd">    &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">    &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">    &gt;&gt;&gt; ps.add(c.parameters.advance, c.parameters.advance.values.none)</span>
+<span class="sd">    &gt;&gt;&gt; len(ps)</span>
+<span class="sd">    1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ParameterSet.__init__">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the ParameterSet class.</span>
+
+<span class="sd">        This class is not meant to be instantiated directly nor used</span>
+<span class="sd">        externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span> <span class="o">=</span> <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetcreate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_throw_if_disposed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;illegal method invocation after ParameterSet.end()&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ParameterSet.end">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.end">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Releases the ParameterSet object.</span>
+
+<span class="sd">        Frees all data structures associated with a ParameterSet. After</span>
+<span class="sd">        a call of the method end(), the invoking object can no longer be</span>
+<span class="sd">        used. Attempts to use them subsequently raise a ValueError.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.end()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disposed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetfree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ReferenceError</span><span class="p">:</span>
+            <span class="c1"># Ignore error raised if the reference env of our weakref</span>
+            <span class="c1"># has been garbage collected. If the env has already been</span>
+            <span class="c1"># closed, then the paramset has already been freed.</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.__del__">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.__del__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Destructor of the ParameterSet class.</span>
+
+<span class="sd">        When a ParameterSet object is destoyed, the end() method is</span>
+<span class="sd">        called.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; del ps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.__enter__">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.__enter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enter the runtime context related to this object.</span>
+
+<span class="sd">        The with statement will bind this method&#39;s return value to the</span>
+<span class="sd">        target specified in the as clause of the statement, if any.</span>
+
+<span class="sd">        ParameterSet objects return themselves.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; with c.create_parameter_set():</span>
+<span class="sd">        ...     pass  # do something here</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.__exit__">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.__exit__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exit the runtime context.</span>
+
+<span class="sd">        When we exit the with block, the end() method is called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.add">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a parameter ID and value to a parameter set.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.advance,</span>
+<span class="sd">        ...        c.parameters.advance.values.none)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">whichparam</span> <span class="o">=</span> <span class="n">_get_id</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        <span class="n">paramtype</span> <span class="o">=</span> <span class="n">_get_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetadd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">,</span> <span class="n">whichparam</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span>
+                          <span class="n">paramtype</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.get">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a parameter value.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.advance,</span>
+<span class="sd">        ...        c.parameters.advance.values.none)</span>
+<span class="sd">        &gt;&gt;&gt; val = ps.get(c.parameters.advance)</span>
+<span class="sd">        &gt;&gt;&gt; val == c.parameters.advance.values.none</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">whichparam</span> <span class="o">=</span> <span class="n">_get_id</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        <span class="n">paramtype</span> <span class="o">=</span> <span class="n">_get_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">,</span> <span class="n">whichparam</span><span class="p">,</span>
+                                 <span class="n">paramtype</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.get_ids">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.get_ids">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the parameter IDs contained in a parameter set.</span>
+
+<span class="sd">        Returns an iterator containing the parameter IDs in a parameter</span>
+<span class="sd">        set.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.advance,</span>
+<span class="sd">        ...        c.parameters.advance.values.none)</span>
+<span class="sd">        &gt;&gt;&gt; list(ps.get_ids())</span>
+<span class="sd">        [1001]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetgetids</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.delete">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes a parameter from a parameter set.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.advance,</span>
+<span class="sd">        ...        c.parameters.advance.values.none)</span>
+<span class="sd">        &gt;&gt;&gt; len(ps)</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; ps.delete(c.parameters.advance)</span>
+<span class="sd">        &gt;&gt;&gt; len(ps)</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetdel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">,</span> <span class="n">_get_id</span><span class="p">(</span><span class="n">param</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.clear">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clears all items from the parameter set.</span>
+
+<span class="sd">        Example Usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.advance,</span>
+<span class="sd">        ...        c.parameters.advance.values.none)</span>
+<span class="sd">        &gt;&gt;&gt; ps.clear()</span>
+<span class="sd">        &gt;&gt;&gt; len(ps)</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ids</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.__len__">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.__len__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of items in the parameter set.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; len(ps)</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetgetnum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.read">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.read">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads parameter names and settings from the file specified by</span>
+<span class="sd">        filename and copies them into the parameter set.</span>
+
+<span class="sd">        Note that the content of the parameter set is not cleared out</span>
+<span class="sd">        before the parameters in the file are copied into the parameter</span>
+<span class="sd">        set. The parameters are read from the file one by one and are</span>
+<span class="sd">        added to the parameter set, or, if the parameter was already</span>
+<span class="sd">        present in the set, then its value is updated.</span>
+
+<span class="sd">        This routine reads and copies files in the PRM format, as created</span>
+<span class="sd">        by Cplex.parameters.write. The PRM format is documented in the</span>
+<span class="sd">        CPLEX File Formats Reference Manual.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.advance.set(c.parameters.advance.values.none)</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.write_file(&#39;example.prm&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.read(&#39;example.prm&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; value = ps.get(c.parameters.advance)</span>
+<span class="sd">        &gt;&gt;&gt; value == c.parameters.advance.values.none</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetreadcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParameterSet.write">
+<a class="viewcode-back" href="../../cplex.html#cplex.ParameterSet.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes a parameter file that contains the parameters in the</span>
+<span class="sd">        parameter set.</span>
+
+<span class="sd">        This routine writes a file in a format suitable for reading by</span>
+<span class="sd">        ParameterSet.read or by Cplex.parameters.read.</span>
+
+<span class="sd">        The file is written in the PRM format which is documented in the</span>
+<span class="sd">        CPLEX File Formats Reference Manual.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.advance,</span>
+<span class="sd">        ...        c.parameters.advance.values.none)</span>
+<span class="sd">        &gt;&gt;&gt; ps.write(&#39;example.prm&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.read_file(&#39;example.prm&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; value = c.parameters.advance.get()</span>
+<span class="sd">        &gt;&gt;&gt; value == c.parameters.advance.values.none</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_throw_if_disposed</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">paramsetwrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cplex.html" >cplex</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex.paramset</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

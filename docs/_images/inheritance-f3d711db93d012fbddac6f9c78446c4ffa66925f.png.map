@@ -1,0 +1,5 @@
+<map id="inheritancea54d0eae2a" name="inheritancea54d0eae2a">
+<area shape="rect" id="node1" href="#cplex.callbacks.Callback" target="_top" title="Base class for Cplex callback classes." alt="" coords="42,5,114,32"/>
+<area shape="rect" id="node3" href="#cplex.callbacks.OptimizationCallback" target="_top" title="Base class for Cplex optimization callback classes." alt="" coords="5,80,151,107"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.MIPInfoCallback" target="_top" title="Subclassable class for MIP informational callback classes." alt="" coords="19,155,137,181"/>
+</map>

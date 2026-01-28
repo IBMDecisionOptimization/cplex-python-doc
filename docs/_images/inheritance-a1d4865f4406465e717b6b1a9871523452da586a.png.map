@@ -1,0 +1,4 @@
+<map id="inheritance0f130ac4b9" name="inheritance0f130ac4b9">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="26,5,128,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.MIPSolutionInterface" target="_top" title="Methods for accessing solutions to a MIP." alt="" coords="5,80,149,107"/>
+</map>

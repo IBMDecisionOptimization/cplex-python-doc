@@ -1,0 +1,4 @@
+<map id="inheritance3118f0008e" name="inheritance3118f0008e">
+<area shape="rect" id="node1" href="#cplex.callbacks.Callback" target="_top" title="Base class for Cplex callback classes." alt="" coords="25,5,97,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.TuningCallback" target="_top" title="Subclassable class for tuning callback classes." alt="" coords="5,80,117,107"/>
+</map>

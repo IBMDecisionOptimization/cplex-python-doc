@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._multiobjsoln &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._multiobjsoln</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._multiobjsoln</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _multiobjsoln.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Multi-Objective Solution API&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_constants</span> <span class="k">as</span> <span class="n">_const</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">_proc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._baseinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constant_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantClass</span>
+
+
+<div class="viewcode-block" id="MultiObjFloatInfo">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjFloatInfo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiObjFloatInfo</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of floating point information that can be queried for</span>
+<span class="sd">    multi-objective optimization.</span>
+
+<span class="sd">    This class contains the types of solution information of type float</span>
+<span class="sd">    that can be retreived from the solution of a sub-problem solved</span>
+<span class="sd">    during multi-objective optimization.</span>
+
+<span class="sd">    This information can be querried for each priority level with method</span>
+<span class="sd">    `MultiObjSolnInterface.get_info`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">time</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_TIME</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_TIME &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_TIME.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">dettime</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_DETTIME</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_DETTIME &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_DETTIME.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_OBJVAL</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_OBJVAL &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_OBJVAL.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">best_objective</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_BESTOBJVAL</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_BESTOBJVAL &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_BESTOBJVAL.html&gt;`_ in the C API.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MultiObjIntInfo">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjIntInfo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiObjIntInfo</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of integer information that can be queried for</span>
+<span class="sd">    multi-objective optimization.</span>
+
+<span class="sd">    This class contains the types of solution information of type float</span>
+<span class="sd">    that can be retreived from the solution of a sub-problem solved</span>
+<span class="sd">    during multi-objective optimization.</span>
+
+<span class="sd">    This information can be querried for each priority level with method</span>
+<span class="sd">    `MultiObjSolnInterface.get_info`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">error</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_ERROR</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_ERROR &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_ERROR.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_STATUS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_STATUS &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_STATUS.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">method</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_METHOD</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_METHOD &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_METHOD.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">priority</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_PRIORITY</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_PRIORITY &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_PRIORITY.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">blend</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_BLEND</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_BLEND &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_BLEND.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">pfeas</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_PFEAS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_PFEAS &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_PFEAS.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">dfeas</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_DFEAS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_DFEAS &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_DFEAS.html&gt;`_ in the C API.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MultiObjLongInfo">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjLongInfo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiObjLongInfo</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of long integer information that can be queried for</span>
+<span class="sd">    multi-objective optimization.</span>
+
+<span class="sd">    This class contains the types of solution information of type float</span>
+<span class="sd">    that can be retreived from the solution of a sub-problem solved</span>
+<span class="sd">    during multi-objective optimization.</span>
+
+<span class="sd">    This information can be querried for each priority level with method</span>
+<span class="sd">    `MultiObjSolnInterface.get_info`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">num_barrier_iterations</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_BARITCNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_BARITCNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_BARITCNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_sifting_iterations</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_SIFTITCNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_SIFTITCNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_SIFTITCNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_sifting_phase1_iterations</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_SIFTPHASE1CNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_SIFTPHASE1CNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_SIFTPHASE1CNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_degenerate_iterations</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_DEGCNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_DEGCNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_DEGCNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_iterations</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_ITCNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_ITCNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_ITCNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_phase1_iterations</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_PHASE1CNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_PHASE1CNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_PHASE1CNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_primal_pushes</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_PPUSH</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_PPUSH &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_PPUSH.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_primal_exchanges</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_PEXCH</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_PEXCH &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_PEXCH.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_dual_pushes</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_DPUSH</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_DPUSH &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_DPUSH.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_dual_exchanges</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_DEXCH</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_DEXCH &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_DEXCH.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_NODECNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_NODECNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_NODECNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">num_nodes_left</span> <span class="o">=</span> <span class="n">_const</span><span class="o">.</span><span class="n">CPX_MULTIOBJ_NODELEFTCNT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `CPX_MULTIOBJ_NODELEFTCNT &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/macros/CPX_MULTIOBJ_NODELEFTCNT.html&gt;`_ in the C API.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MultiObjSolnInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjSolnInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiObjSolnInterface</span><span class="p">(</span><span class="n">BaseInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Methods for accessing solutions for multi-objective models.</span>
+
+<span class="sd">    The methods in this interface can be used to query solutions for</span>
+<span class="sd">    multi-objective models.</span>
+
+<span class="sd">    See also `MultiObjInterface` where methods for adding, querying, and</span>
+<span class="sd">    modifying multiple objectives can be found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">float_info</span> <span class="o">=</span> <span class="n">MultiObjFloatInfo</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `MultiObjFloatInfo()` &quot;&quot;&quot;</span>
+
+    <span class="n">int_info</span> <span class="o">=</span> <span class="n">MultiObjIntInfo</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `MultiObjIntInfo()` &quot;&quot;&quot;</span>
+
+    <span class="n">long_info</span> <span class="o">=</span> <span class="n">MultiObjLongInfo</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `MultiObjLongInfo()` &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MultiObjSolnInterface.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjSolnInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new MIPSolutionInterface.</span>
+
+<span class="sd">        The multi-objective solution interface is exposed by the</span>
+<span class="sd">        top-level `Cplex` class as Cplex.solution.multiobj. This</span>
+<span class="sd">        constructor is not meant to be used externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cplex</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">_cplex</span><span class="p">,</span> <span class="n">advanced</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjSolnInterface.get_objective_value">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjSolnInterface.get_objective_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_objective_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of an objective function.</span>
+
+<span class="sd">        objidx is the name or index of the objective to be accessed.</span>
+
+<span class="sd">        See `CPXmultiobjgetobjval &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetobjval.html&gt;`_ in the Callable Library</span>
+<span class="sd">        Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_results_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_log_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; c.read(&quot;example.mps&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_num(2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(</span>
+<span class="sd">        ...     1,</span>
+<span class="sd">        ...     [(i, o) for i, o in enumerate(c.multiobj.get_linear(0))]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; c.solve()</span>
+<span class="sd">        &gt;&gt;&gt; c.solution.multiobj.get_objective_value(0)</span>
+<span class="sd">        -202.5</span>
+<span class="sd">        &gt;&gt;&gt; c.solution.multiobj.get_objective_value(1)</span>
+<span class="sd">        -202.5</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">multiobj</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetobjval</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+            <span class="n">objidx</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjSolnInterface.get_objval_by_priority">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjSolnInterface.get_objval_by_priority">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_objval_by_priority</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">priority</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of an objective function by priority.</span>
+
+<span class="sd">        After multi-objective optimization, returns the blended objective</span>
+<span class="sd">        value for the specified priority.</span>
+
+<span class="sd">        See `CPXmultiobjgetobjvalbypriority &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetobjvalbypriority.html&gt;`_ in the Callable</span>
+<span class="sd">        Library Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_results_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_log_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; c.read(&quot;example.mps&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_num(2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(</span>
+<span class="sd">        ...     1,</span>
+<span class="sd">        ...     [(i, o) for i, o in enumerate(c.multiobj.get_linear(0))]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(0, 1)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(1, 2)</span>
+<span class="sd">        &gt;&gt;&gt; c.solve()</span>
+<span class="sd">        &gt;&gt;&gt; c.solution.multiobj.get_objval_by_priority(1)</span>
+<span class="sd">        -202.5</span>
+<span class="sd">        &gt;&gt;&gt; c.solution.multiobj.get_objval_by_priority(2)</span>
+<span class="sd">        -202.5</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetobjvalbypriority</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+            <span class="n">priority</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjSolnInterface.get_num_solves">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjSolnInterface.get_num_solves">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num_solves</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of sub-problems that where successfully</span>
+<span class="sd">        solved during the last optimization of a multi-objective problem.</span>
+
+<span class="sd">        See `CPXmultiobjgetnumsolves &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetnumsolves.html&gt;`_ in the Callable Library</span>
+<span class="sd">        Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_results_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_log_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; c.read(&quot;example.mps&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_num(2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(</span>
+<span class="sd">        ...     1,</span>
+<span class="sd">        ...     [(i, o) for i, o in enumerate(c.multiobj.get_linear(0))]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(0, 1)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(1, 2)</span>
+<span class="sd">        &gt;&gt;&gt; c.solve()</span>
+<span class="sd">        &gt;&gt;&gt; c.solution.multiobj.get_num_solves()</span>
+<span class="sd">        2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetnumsolves</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_isintinfo</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">MultiObjSolnInterface</span><span class="o">.</span><span class="n">int_info</span><span class="p">[</span><span class="n">what</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_islonginfo</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">MultiObjSolnInterface</span><span class="o">.</span><span class="n">long_info</span><span class="p">[</span><span class="n">what</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_isdblinfo</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">MultiObjSolnInterface</span><span class="o">.</span><span class="n">float_info</span><span class="p">[</span><span class="n">what</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="MultiObjSolnInterface.get_info">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobjsoln.MultiObjSolnInterface.get_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subprob</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the solution information of a sub-problem of a</span>
+<span class="sd">        multi-objective optimization.</span>
+
+<span class="sd">        subprob is the sub-problem of a multi-objective optimization.</span>
+
+<span class="sd">        what is an attribute from Cplex.solution.multiobj.float_info</span>
+<span class="sd">        (see `MultiObjFloatInfo`), Cplex.solution.multiobj.int_info</span>
+<span class="sd">        (see `MultiObjIntInfo`), or Cplex.solution.multiobj.long_info</span>
+<span class="sd">        (see `MultiObjLongInfo`).</span>
+
+<span class="sd">        See `CPXmultiobjgetdblinfo &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetdblinfo.html&gt;`_,</span>
+<span class="sd">        `CPXmultiobjgetintinfo &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetintinfo.html&gt;`_,</span>
+<span class="sd">        `CPXmultiobjgetlonginfo &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetlonginfo.html&gt;`_, etc. in the Callable Library</span>
+<span class="sd">        Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_results_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_log_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; c.read(&quot;example.mps&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_num(2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(</span>
+<span class="sd">        ...     1,</span>
+<span class="sd">        ...     [(i, o) for i, o in enumerate(c.multiobj.get_linear(0))]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(0, 1)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(1, 2)</span>
+<span class="sd">        &gt;&gt;&gt; c.solve()</span>
+<span class="sd">        &gt;&gt;&gt; num = c.solution.multiobj.get_num_solves()</span>
+<span class="sd">        &gt;&gt;&gt; for i in range(num):</span>
+<span class="sd">        ...     priority = c.solution.multiobj.get_info(</span>
+<span class="sd">        ...         i,</span>
+<span class="sd">        ...         c.solution.multiobj.int_info.priority</span>
+<span class="sd">        ...     )</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">MultiObjSolnInterface</span><span class="o">.</span><span class="n">_isintinfo</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetintinfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                            <span class="n">subprob</span><span class="p">,</span> <span class="n">what</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">MultiObjSolnInterface</span><span class="o">.</span><span class="n">_islonginfo</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetlonginfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                             <span class="n">subprob</span><span class="p">,</span> <span class="n">what</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">MultiObjSolnInterface</span><span class="o">.</span><span class="n">_isdblinfo</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetdblinfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                            <span class="n">subprob</span><span class="p">,</span> <span class="n">what</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">what</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._multiobjsoln</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
