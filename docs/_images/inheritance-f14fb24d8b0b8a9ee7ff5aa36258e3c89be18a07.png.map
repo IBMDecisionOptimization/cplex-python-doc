@@ -1,0 +1,4 @@
+<map id="inheritancee0a3d97e95" name="inheritancee0a3d97e95">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="18,5,120,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.ObjectiveInterface" target="_top" title="Contains methods for querying and modifying the objective function." alt="" coords="5,80,133,107"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="inheritancefa29f8ee68" name="inheritancefa29f8ee68">
+<area shape="rect" id="node1" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.ContextType" target="_top" title="The different contexts in which a generic callback can be invoked." alt="" coords="12,80,107,107"/>
+</map>

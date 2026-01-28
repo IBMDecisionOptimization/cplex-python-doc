@@ -1,0 +1,5 @@
+<map id="inheritance10f8b36bb5" name="inheritance10f8b36bb5">
+<area shape="rect" id="node1" href="#cplex._internal._anno.AnnotationInterface" target="_top" title="Methods for adding, querying, and modifying annotations." alt="" coords="26,80,160,107"/>
+<area shape="rect" id="node3" href="#cplex._internal._anno.DoubleAnnotationInterface" target="_top" title="Methods for adding, querying, and modifying double annotations." alt="" coords="5,155,181,181"/>
+<area shape="rect" id="node2" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="42,5,144,32"/>
+</map>

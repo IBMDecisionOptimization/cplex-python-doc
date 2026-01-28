@@ -1,0 +1,4 @@
+<map id="inheritancec10c4f7560" name="inheritancec10c4f7560">
+<area shape="rect" id="node1" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.UseCut" target="_top" title="Constants to specify when to use the added cut." alt="" coords="24,80,96,107"/>
+</map>

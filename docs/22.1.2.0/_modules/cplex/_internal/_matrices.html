@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._matrices &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._matrices</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._matrices</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -----------------------------------------------------------------------</span>
+<span class="c1"># File: _matrices.py</span>
+<span class="c1"># -----------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># -----------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:undocumented: _C_HB_Matrix, _HB_Matrix</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._aux_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_list_args</span><span class="p">,</span> <span class="n">validate_arg_lengths</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">CplexError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_pycplex</span> <span class="k">as</span> <span class="n">CPX</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SparsePair</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for storing sparse vector data.</span>
+
+<span class="sd">    An instance of this class has two attributes, ind and val.  ind</span>
+<span class="sd">    specifies the indices and val specifies the values.  ind and val</span>
+<span class="sd">    must be sequences of the same length.  In general, ind may contain</span>
+<span class="sd">    any identifier; for example, when a SparsePair object is passed to</span>
+<span class="sd">    Cplex.linear_constraints.add, its ind attribute may be a list</span>
+<span class="sd">    containing both variable names and variable indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="s2">&quot;cplex&quot;</span>
+
+<div class="viewcode-block" id="SparsePair.__init__">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparsePair.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for SparsePair.</span>
+
+<span class="sd">        Takes two arguments, ind and val; ind specifies the indices that</span>
+<span class="sd">        the SparsePair refers to, and val specifies the float values</span>
+<span class="sd">        associated with those indices; ind and val must have the same</span>
+<span class="sd">        length.  If ind or val is omitted, they will default to an empty</span>
+<span class="sd">        list.</span>
+
+<span class="sd">        &gt;&gt;&gt; spair = SparsePair(ind=[0], val=[1.0])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ind</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">init_list_args</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ind</span> <span class="o">=</span> <span class="n">ind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isvalid</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">CplexError</span><span class="p">(</span><span class="s2">&quot;Inconsistent input data to SparsePair&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SparsePair.__repr__">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparsePair.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Representation method of SparsePair.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; SparsePair(ind=[0], val=[1.0])</span>
+<span class="sd">        SparsePair(ind = [0], val = [1.0])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;SparsePair(ind = &quot;</span><span class="p">,</span>
+                        <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="p">),</span>
+                        <span class="s2">&quot;, val = &quot;</span><span class="p">,</span>
+                        <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="s2">&quot;)&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="SparsePair.isvalid">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparsePair.isvalid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isvalid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tests that ind and val have the same length.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; spair = SparsePair(ind=[0, 1, 2], val=[1.0, 1.0, 1.0])</span>
+<span class="sd">        &gt;&gt;&gt; spair.isvalid()</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SparsePair.unpack">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparsePair.unpack">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the indices and values sequences as a tuple.</span>
+
+<span class="sd">        Returns ind and val as given in __init__.</span>
+
+<span class="sd">        &gt;&gt;&gt; spair = SparsePair(ind=[0, 1, 2], val=[1.0, 1.0, 1.0])</span>
+<span class="sd">        &gt;&gt;&gt; ind, val = spair.unpack()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_HBMatrix</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public</span>
+
+<span class="sd">    :undocumented: __init__, __len__, __getitem__</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matbeg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matind</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matbeg</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matind</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matval</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">vector</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">SparsePair</span><span class="p">):</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ind</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">val</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">validate_arg_lengths</span><span class="p">([</span><span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">matbeg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matind</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">matind</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">matval</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matbeg</span> <span class="o">=</span> <span class="n">matbeg</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matind</span> <span class="o">=</span> <span class="n">matind</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matval</span> <span class="o">=</span> <span class="n">matval</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matbeg</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matbeg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matind</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matbeg</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">SparsePair</span><span class="p">(</span><span class="n">CPX</span><span class="o">.</span><span class="n">_getArrayView</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matind</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span> <span class="n">CPX</span><span class="o">.</span><span class="n">_getArrayView</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matval</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">stop</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">stop</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SparseTriple</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for storing sparse matrix data.</span>
+
+<span class="sd">    An instance of this class has three attributes, ind1, ind2, and val.</span>
+<span class="sd">    ind1 and ind2 specify the indices and val specifies the values.</span>
+<span class="sd">    ind1, ind2, and val must be sequences of the same length.  In</span>
+<span class="sd">    general, ind1 and ind2 may contain any identifier; for example, when</span>
+<span class="sd">    a SparseTriple object is passed to Cplex.quadratic_constraints.add,</span>
+<span class="sd">    its ind1 attribute may be a list containing both variable names and</span>
+<span class="sd">    variable indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="s2">&quot;cplex&quot;</span>
+
+<div class="viewcode-block" id="SparseTriple.__init__">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparseTriple.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ind2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for SparseTriple.</span>
+
+<span class="sd">        Takes three arguments, ind1, ind2 and val, specifying the</span>
+<span class="sd">        indices that the SparseTriple refers to and the float values</span>
+<span class="sd">        associated with those indices, respectively.  ind1, ind2, and</span>
+<span class="sd">        val must all have the same length.  If ind1, ind2, or val is</span>
+<span class="sd">        omitted, they will default to an empty list.</span>
+
+<span class="sd">        &gt;&gt;&gt; striple = SparseTriple(ind1=[0], ind2=[0], val=[1.0])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">init_list_args</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ind1</span> <span class="o">=</span> <span class="n">ind1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ind2</span> <span class="o">=</span> <span class="n">ind2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isvalid</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">CplexError</span><span class="p">(</span><span class="s2">&quot;Inconsistent input data to SparseTriple&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SparseTriple.__repr__">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparseTriple.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Representation method of SparseTriple.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; SparseTriple(ind1=[0], ind2=[0], val=[1.0])</span>
+<span class="sd">        SparseTriple(ind1 = [0], ind2 = [0], val = [1.0])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;SparseTriple(ind1 = &quot;</span><span class="p">,</span>
+                        <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind1</span><span class="p">),</span>
+                        <span class="s2">&quot;, ind2 = &quot;</span><span class="p">,</span>
+                        <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind2</span><span class="p">),</span>
+                        <span class="s2">&quot;, val = &quot;</span><span class="p">,</span>
+                        <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="s2">&quot;)&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="SparseTriple.isvalid">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparseTriple.isvalid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isvalid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tests that ind1, ind2, and val have the same length.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; striple = SparseTriple(ind1=[0, 1], ind2=[0, 1],</span>
+<span class="sd">        ...                        val=[1.0, 1.0])</span>
+<span class="sd">        &gt;&gt;&gt; striple.isvalid()</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind2</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SparseTriple.unpack">
+<a class="viewcode-back" href="../../../cplex.html#cplex.SparseTriple.unpack">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the indices and values sequences as a tuple.</span>
+
+<span class="sd">        Returns ind1, ind2, and val as given in __init__.</span>
+
+<span class="sd">        &gt;&gt;&gt; striple = SparseTriple(ind1=[0, 1], ind2=[0, 1],</span>
+<span class="sd">        ...                        val=[1.0, 1.0])</span>
+<span class="sd">        &gt;&gt;&gt; ind1, ind2, val = striple.unpack()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ind1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ind2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span></div>
+
+
+
+<div class="viewcode-block" id="unpack_pair">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex.unpack_pair">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unpack_pair</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts the indices and values from an object.</span>
+
+<span class="sd">    The argument item can either be an instance of SparsePair or a</span>
+<span class="sd">    sequence of length two.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; sp = SparsePair()</span>
+<span class="sd">    &gt;&gt;&gt; ind, val = unpack_pair(sp)</span>
+<span class="sd">    &gt;&gt;&gt; lin_expr = [[], []]</span>
+<span class="sd">    &gt;&gt;&gt; ind, val = unpack_pair(lin_expr)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">item</span><span class="o">.</span><span class="n">isvalid</span><span class="p">()</span>
+        <span class="n">ind</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">unpack</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">ind</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">validate_arg_lengths</span><span class="p">([</span><span class="n">ind</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ind</span><span class="p">,</span> <span class="n">val</span></div>
+
+
+
+<div class="viewcode-block" id="unpack_triple">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex.unpack_triple">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unpack_triple</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts the indices and values from an object.</span>
+
+<span class="sd">    The argument item can either be an instance of SparseTriple or a</span>
+<span class="sd">    sequence of length three.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; st = SparseTriple()</span>
+<span class="sd">    &gt;&gt;&gt; ind1, ind2, val = unpack_triple(st)</span>
+<span class="sd">    &gt;&gt;&gt; quad_expr = [[], [], []]</span>
+<span class="sd">    &gt;&gt;&gt; ind1, ind2, val = unpack_triple(quad_expr)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">item</span><span class="o">.</span><span class="n">isvalid</span><span class="p">()</span>
+        <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">unpack</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">validate_arg_lengths</span><span class="p">([</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">val</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">val</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._matrices</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

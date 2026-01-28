@@ -1,0 +1,4 @@
+<map id="inheritance687e18ce32" name="inheritance687e18ce32">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="5,5,108,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.SOSInterface" target="_top" title="Class containing methods for Special Ordered Sets (SOS)." alt="" coords="6,80,107,107"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="inheritance98069aca0a" name="inheritance98069aca0a">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="17,5,119,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.VariablesInterface" target="_top" title="Methods for adding, querying, and modifying variables." alt="" coords="5,80,131,107"/>
+</map>

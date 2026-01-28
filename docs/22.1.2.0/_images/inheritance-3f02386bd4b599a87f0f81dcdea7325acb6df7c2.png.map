@@ -1,0 +1,4 @@
+<map id="inheritance9267a287cb" name="inheritance9267a287cb">
+<area shape="rect" id="node1" href="#cplex._internal._parameter_classes.ParameterGroup" target="_top" title="Class containing a group of Cplex parameters." alt="" coords="19,5,136,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._parameter_classes.RootParameterGroup" target="_top" title="Class containing all the Cplex parameters." alt="" coords="5,80,150,107"/>
+</map>

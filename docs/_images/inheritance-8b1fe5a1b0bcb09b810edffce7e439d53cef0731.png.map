@@ -1,0 +1,4 @@
+<map id="inheritance871ab2abe9" name="inheritance871ab2abe9">
+<area shape="rect" id="node1" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.MethodType" target="_top" title="Constants defining methods for solving the node LP." alt="" coords="13,80,106,107"/>
+</map>

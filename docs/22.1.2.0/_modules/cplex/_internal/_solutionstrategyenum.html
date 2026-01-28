@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._solutionstrategyenum &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._solutionstrategyenum</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._solutionstrategyenum</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># Version 22.1.2</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2000, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;A module for the SolutionStrategy class.&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_constantsenum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constant_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantClass</span>
+
+
+<div class="viewcode-block" id="SolutionStrategy">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._solutionstrategyenum.SolutionStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SolutionStrategy</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The different types of solutions that can submitted to</span>
+<span class="sd">    `cplex.callbacks.Context.post_heuristic_solution()`.</span>
+
+<span class="sd">    For further details about these values, see the reference manual of</span>
+<span class="sd">    the CPLEX Callable Library (C API) particularly, the enumeration</span>
+<span class="sd">    `CPXCALLBACKSOLUTIONSTRATEGY &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/enum/CPXCALLBACKSOLUTIONSTRATEGY.html&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">no_check</span> <span class="o">=</span> <span class="n">_constantsenum</span><span class="o">.</span><span class="n">CPXCALLBACKSOLUTION_NOCHECK</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXCALLBACKSOLUTION_NOCHECK in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">check_feasible</span> <span class="o">=</span> <span class="n">_constantsenum</span><span class="o">.</span><span class="n">CPXCALLBACKSOLUTION_CHECKFEAS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXCALLBACKSOLUTION_CHECKFEAS in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">propagate</span> <span class="o">=</span> <span class="n">_constantsenum</span><span class="o">.</span><span class="n">CPXCALLBACKSOLUTION_PROPAGATE</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXCALLBACKSOLUTION_PROPAGATE in the C API.&quot;&quot;&quot;</span>
+
+    <span class="n">solve</span> <span class="o">=</span> <span class="n">_constantsenum</span><span class="o">.</span><span class="n">CPXCALLBACKSOLUTION_SOLVE</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See CPXCALLBACKSOLUTION_SOLVE in the C API.&quot;&quot;&quot;</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._solutionstrategyenum</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

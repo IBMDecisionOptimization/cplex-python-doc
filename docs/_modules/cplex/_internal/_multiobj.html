@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._multiobj &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._multiobj</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._multiobj</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _multiobj.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Multi-Objective API&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._baseinterface</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._subinterfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjSense</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">_proc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_aux_functions</span> <span class="k">as</span> <span class="n">_aux</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_matrices</span> <span class="k">as</span> <span class="n">_mat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_pycplex</span> <span class="k">as</span> <span class="n">CPX</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Pair</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="MultiObjInterface">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiObjInterface</span><span class="p">(</span><span class="n">BaseInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Methods for adding, querying, and modifying multiple objectives.</span>
+
+<span class="sd">    The methods in this interface can be used to add, query, and modify</span>
+<span class="sd">    objectives in a specified problem. These objectives are used when</span>
+<span class="sd">    multi-objective optimization is initiated.</span>
+
+<span class="sd">    See also `MultiObjSolnInterface` where methods for accessing</span>
+<span class="sd">    solutions for multi-objective models can be found.</span>
+
+<span class="sd">    For more details see the section on multi-objective optimization in</span>
+<span class="sd">    the CPLEX User&#39;s Manual.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sense</span> <span class="o">=</span> <span class="n">ObjSense</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `ObjSense()`&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MultiObjInterface.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new MultiObjInterface.</span>
+
+<span class="sd">        The Multi-Objective interface is exposed by the top-level `Cplex`</span>
+<span class="sd">        class as `Cplex.multiobj`. This constructor is not meant to be</span>
+<span class="sd">        used externally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cplex</span><span class="o">=</span><span class="n">cpx</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="o">=</span><span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetindex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_num">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of objectives in the problem.</span>
+
+<span class="sd">        See `CPXgetnumobjs &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/getnumobjs.html&gt;`_ in the Callable Library Reference</span>
+<span class="sd">        Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_num()</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.multiobj.set_num(2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_num()</span>
+<span class="sd">        2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">getnumobjs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_num">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numobj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the number of objectives in the problem instance.</span>
+
+<span class="sd">        There is always at least one objective in the problem instance</span>
+<span class="sd">        (indexed 0) thus numobj must be at least 1. If before calling</span>
+<span class="sd">        this method there were more objectives in the instance than the</span>
+<span class="sd">        specified numobj then the objectives whose index is &gt;= numobj are</span>
+<span class="sd">        removed from the instance. If before calling this method the</span>
+<span class="sd">        number of objectives was &lt;= numobj then new objectives are</span>
+<span class="sd">        created, all with all-zero coefficients and default settings</span>
+<span class="sd">        (like priority, weight, etc).</span>
+
+<span class="sd">        See `CPXsetnumobjs &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/setnumobjs.html&gt;`_ in the Callable Library Reference</span>
+<span class="sd">        Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_num(2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_num()</span>
+<span class="sd">        2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">setnumobjs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">numobj</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_names">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the names of a set of objectives.</span>
+
+<span class="sd">        There are four forms by which multiobj.get_names may be called.</span>
+
+<span class="sd">        multiobj.get_names()</span>
+<span class="sd">          return the names of all objectives from the problem.</span>
+
+<span class="sd">        multiobj.get_names(i)</span>
+<span class="sd">          i must be an objective index. Returns the name of row i.</span>
+
+<span class="sd">        multiobj.get_names(s)</span>
+<span class="sd">          s must be a sequence of objective indices. Returns the names of</span>
+<span class="sd">          the objectives with indices the members of s. Equivalent to</span>
+<span class="sd">          [multiobj.get_names(i) for i in s]</span>
+
+<span class="sd">        multiobj.get_names(begin, end)</span>
+<span class="sd">          begin and end must be objective indices. Returns the names of</span>
+<span class="sd">          the objectives with indices between begin and end, inclusive of</span>
+<span class="sd">          end. Equivalent to multiobj.get_names(range(begin, end + 1)).</span>
+
+<span class="sd">        See `CPXmultiobjgetname &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetname.html&gt;`_ in the Callable Library</span>
+<span class="sd">        Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_definition(0, name=&#39;mo1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_names(0)</span>
+<span class="sd">        &#39;mo1&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_name</span><span class="p">(</span><span class="n">objidx</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                         <span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_one_arg</span><span class="p">(</span><span class="n">_get_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">get_num</span><span class="p">(),</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_name">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the name of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_num(3)</span>
+<span class="sd">        &gt;&gt;&gt; for i in range(3):</span>
+<span class="sd">        ...     c.multiobj.set_name(i, str(i))</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_names()</span>
+<span class="sd">        [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjchgattribs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                 <span class="n">objidx</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_definition">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_definition">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the definition of an objective.</span>
+
+<span class="sd">        Returns an objective definitions, where the definition is a list</span>
+<span class="sd">        containing the following components: obj (a list containing the</span>
+<span class="sd">        linear objective coefficients), offset, weight, priority, abstol,</span>
+<span class="sd">        reltol (see `set_definition`).</span>
+
+<span class="sd">        objidx is the name or index of the objective to be accessed.</span>
+
+<span class="sd">        The optional begin and end arguments must be variable indices</span>
+<span class="sd">        or names. Together, begin and end specify the range of objective</span>
+<span class="sd">        function coefficients to be returned. By default, the linear</span>
+<span class="sd">        objective coefficients of all variables from the problem will be</span>
+<span class="sd">        returned (i.e., begin will default to the first variable index</span>
+<span class="sd">        and end will default to the last variable index).</span>
+
+<span class="sd">        See `CPXmultiobjgetobj &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjgetobj.html&gt;`_ in the Callable Library Reference</span>
+<span class="sd">        Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; varind = list(c.variables.add(obj=[1.0, 2.0]))</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_definition(0)</span>
+<span class="sd">        [[1.0, 2.0], 0.0, 1.0, 0, 0.0, 0.0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">varconv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">_conv</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="n">varconv</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">get_num</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">varconv</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjgetobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                    <span class="n">objidx</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_definition">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_definition">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                       <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">abstol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reltol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the definition of an objective.</span>
+
+<span class="sd">        multiobj.set_definition accepts the keyword arguments objidx,</span>
+<span class="sd">        obj, offset, weight, priority, abstol, reltol, and name.</span>
+
+<span class="sd">        objidx is the name or index of the objective to be set. The</span>
+<span class="sd">        objective index must be in the interval</span>
+<span class="sd">        [0, Cplex.multiobj.get_num() - 1].</span>
+
+<span class="sd">        obj can be either a SparsePair or a list of two lists specifying</span>
+<span class="sd">        the linear component of the objective. If not specified, the</span>
+<span class="sd">        coefficients of every variable are set to 0.0.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">          obj must not contain duplicate indices. If obj references a</span>
+<span class="sd">          variable more than once, either by index, name, or a</span>
+<span class="sd">          combination of index and name, an exception will be raised.</span>
+
+<span class="sd">        offset is the offset of the objective to be set. If not</span>
+<span class="sd">        specififed, the offset is set to 0.0.</span>
+
+<span class="sd">        weight is the weight of the objective to be set. For the</span>
+<span class="sd">        definition of the weight see the description of blended objective</span>
+<span class="sd">        in the multi-objective optimization section of the CPLEX User&#39;s</span>
+<span class="sd">        Manual. If not specified, the weight is set to 1.0.</span>
+
+<span class="sd">        priority is the priority of the objective to be set. It must be a</span>
+<span class="sd">        nonnegative integer. For the definition of the priority see the</span>
+<span class="sd">        description of lexicographic objective in the multi-objective</span>
+<span class="sd">        optimization section of the CPLEX User&#39;s Manual. If not</span>
+<span class="sd">        specified, the priority is set to 0.</span>
+
+<span class="sd">        abstol is the absolute tolerance of the objective to be set. If</span>
+<span class="sd">        not specified, the absolute tolerance is set to 0.0.</span>
+
+<span class="sd">        reltol is the relative tolerance of the objective to be set. If</span>
+<span class="sd">        not specified, the relative tolerance is set to 0.0.</span>
+
+<span class="sd">        name is a string representing the name of the objective to be</span>
+<span class="sd">        set. If not specified, the objective name will default to None.</span>
+
+<span class="sd">        See `CPXmultiobjsetobj &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjsetobj.html&gt;`_ in the Callable Library Reference</span>
+<span class="sd">        Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; varind = list(c.variables.add(names=[&#39;x1&#39;, &#39;x2&#39;]))</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_definition(</span>
+<span class="sd">        ...     objidx=0,</span>
+<span class="sd">        ...     obj=cplex.SparsePair(ind=varind, val=[1.0, 2.0]),</span>
+<span class="sd">        ...     offset=0.0,</span>
+<span class="sd">        ...     weight=1.0,</span>
+<span class="sd">        ...     priority=0,</span>
+<span class="sd">        ...     abstol=1e-06,</span>
+<span class="sd">        ...     reltol=1e-04,</span>
+<span class="sd">        ...     name=&#39;obj1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_definition(&#39;obj1&#39;)</span>
+<span class="sd">        [[1.0, 2.0], 0.0, 1.0, 0, 1e-06, 0.0001]</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_names(0)</span>
+<span class="sd">        &#39;obj1&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">_mat</span><span class="o">.</span><span class="n">SparsePair</span><span class="p">()</span>
+        <span class="n">objind</span><span class="p">,</span> <span class="n">objval</span> <span class="o">=</span> <span class="n">_mat</span><span class="o">.</span><span class="n">unpack_pair</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">objind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objind</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">abstol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">abstol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">mip</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">absmipgap</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reltol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reltol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">mip</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">mipgap</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjsetobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">objind</span><span class="p">,</span>
+                             <span class="n">objval</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="n">abstol</span><span class="p">,</span> <span class="n">reltol</span><span class="p">,</span>
+                             <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_linear">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_linear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the linear coefficients of a set of variables.</span>
+
+<span class="sd">        Can be called by four forms each of which requires an objidx</span>
+<span class="sd">        argument. objidx must be an objective name or index.</span>
+
+<span class="sd">        multiobj.get_linear(objidx)</span>
+<span class="sd">          return the linear objective coefficients of all variables</span>
+<span class="sd">          from the problem.</span>
+
+<span class="sd">        multiobj.get_linear(objidx, i)</span>
+<span class="sd">          i must be a variable name or index. Returns the linear</span>
+<span class="sd">          objective coefficient of the variable whose index or name is i.</span>
+
+<span class="sd">        multiobj.get_linear(objidx, s)</span>
+<span class="sd">          s must be a sequence of variable names or indices. Returns the</span>
+<span class="sd">          linear objective coefficient of the variables with indices the</span>
+<span class="sd">          members of s. Equivalent to</span>
+<span class="sd">          [multiobj.get_linear(objidx, i) for i in s]</span>
+
+<span class="sd">        multiobj.get_linear(objidx, begin, end)</span>
+<span class="sd">          begin and end must be variable indices or variable names.</span>
+<span class="sd">          Returns the linear objective coefficient of the variables with</span>
+<span class="sd">          indices between begin and end, inclusive of end. Equivalent to</span>
+<span class="sd">          multiobj.get_linear(objidx, range(begin, end + 1)).</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(</span>
+<span class="sd">        ...     obj=[1.5 * i for i in range(10)],</span>
+<span class="sd">        ...     names=[str(i) for i in range(10)])</span>
+<span class="sd">        &gt;&gt;&gt; c.variables.get_num()</span>
+<span class="sd">        10</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0, 8)</span>
+<span class="sd">        12.0</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0, &#39;1&#39;, 3)</span>
+<span class="sd">        [1.5, 3.0, 4.5]</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0, [2, &#39;0&#39;, 5])</span>
+<span class="sd">        [3.0, 0.0, 7.5]</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0)</span>
+<span class="sd">        [0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">getcoeffs</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">get_num</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">CPX</span><span class="o">.</span><span class="n">_getArrayView</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_aux</span><span class="o">.</span><span class="n">apply_freeform_two_args</span><span class="p">(</span>
+            <span class="n">getcoeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_linear">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_linear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Changes the linear part of an objective function.</span>
+
+<span class="sd">        Can be called by two forms each of which requires an objidx</span>
+<span class="sd">        argument. objidx must be an objective name or index.</span>
+
+<span class="sd">        multiobj.set_linear(objidx, var, value)</span>
+<span class="sd">          var must be a variable index or name and value must be a float.</span>
+<span class="sd">          Changes the coefficient of the variable identified by var to</span>
+<span class="sd">          value.</span>
+
+<span class="sd">        multiobj.set_linear(objidx, sequence)</span>
+<span class="sd">          sequence is a sequence of pairs (var, value) as described</span>
+<span class="sd">          above. Changes the coefficients for the specified variables to</span>
+<span class="sd">          the given values.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(names=[str(i) for i in range(4)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0)</span>
+<span class="sd">        [0.0, 0.0, 0.0, 0.0]</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(0, 0, 1.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0)</span>
+<span class="sd">        [1.0, 0.0, 0.0, 0.0]</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(0, &#39;3&#39;, -1.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0)</span>
+<span class="sd">        [1.0, 0.0, 0.0, -1.0]</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_linear(0, [(&#39;2&#39;, 2.0), (1, 0.5)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_linear(0)</span>
+<span class="sd">        [1.0, 0.5, 2.0, -1.0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="n">_Pair</span><span class="p">()</span>
+        <span class="c1"># NB: pair.first and pair.second get set as a side effect of</span>
+        <span class="c1">#     running apply_pairs below!</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set_pair</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">):</span>
+            <span class="n">pair</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">first</span>
+            <span class="n">pair</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="n">second</span>
+        <span class="n">_aux</span><span class="o">.</span><span class="n">apply_pairs</span><span class="p">(</span><span class="n">set_pair</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">_conv</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">ncols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">get_num</span><span class="p">()</span>
+        <span class="n">allind</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ncols</span><span class="p">))</span>
+        <span class="c1"># To preserve the values that have not been provided, we query</span>
+        <span class="c1"># current objective. This is to maintain consistent semantics</span>
+        <span class="c1"># with Cplex.objective.set_linear.</span>
+        <span class="n">allval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">multiobj</span><span class="o">.</span><span class="n">get_linear</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">first</span><span class="p">,</span> <span class="n">pair</span><span class="o">.</span><span class="n">second</span><span class="p">):</span>
+            <span class="n">allval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjsetobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span>
+                             <span class="n">objind</span><span class="o">=</span><span class="n">allind</span><span class="p">,</span> <span class="n">objval</span><span class="o">=</span><span class="n">allval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_sense">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_sense">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the sense of all objective functions.</span>
+
+<span class="sd">        See `ObjSense`.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.sense[c.multiobj.get_sense()]</span>
+<span class="sd">        &#39;minimize&#39;</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_sense(c.multiobj.sense.maximize)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.sense[c.multiobj.get_sense()]</span>
+<span class="sd">        &#39;maximize&#39;</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_sense(c.multiobj.sense.minimize)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.sense[c.multiobj.get_sense()]</span>
+<span class="sd">        &#39;minimize&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">objective</span><span class="o">.</span><span class="n">get_sense</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_sense">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_sense">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_sense</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sense</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the sense of all objective functions.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">          All objective functions share the same sense. To model an</span>
+<span class="sd">          objective with a different sense use a negative value for the</span>
+<span class="sd">          weight attribute. See `set_weight`.</span>
+
+<span class="sd">        The argument to this method must be either `ObjSense.minimize`</span>
+<span class="sd">        or `ObjSense.maximize`.</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.sense[c.multiobj.get_sense()]</span>
+<span class="sd">        &#39;minimize&#39;</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_sense(c.multiobj.sense.maximize)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.sense[c.multiobj.get_sense()]</span>
+<span class="sd">        &#39;maximize&#39;</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_sense(c.multiobj.sense.minimize)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.sense[c.multiobj.get_sense()]</span>
+<span class="sd">        &#39;minimize&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">objective</span><span class="o">.</span><span class="n">set_sense</span><span class="p">(</span><span class="n">sense</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_offset">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_offset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the constant offset of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_offset(0)</span>
+<span class="sd">        0.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">offset</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_offset">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_offset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the constant offset of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.objective.set_offset(3.14)</span>
+<span class="sd">        &gt;&gt;&gt; c.objective.get_offset()</span>
+<span class="sd">        3.14</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjchgattribs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                 <span class="n">objidx</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_weight">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_weight">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the weight of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_weight(0)</span>
+<span class="sd">        1.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">weight</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_weight">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_weight">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the weight of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">          All objective functions share the same sense. To model an</span>
+<span class="sd">          objective with a different sense use a negative value for the</span>
+<span class="sd">          weight attribute. See `set_sense`.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_weight(0, -2.0)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_weight(0)</span>
+<span class="sd">        -2.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjchgattribs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                 <span class="n">objidx</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_priority">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_priority">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_priority</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the priority of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_priority(0)</span>
+<span class="sd">        0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">priority</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_priority">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_priority">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_priority</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">priority</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the priority of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_priority(0, 2)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_priority(0)</span>
+<span class="sd">        2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjchgattribs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                 <span class="n">objidx</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">priority</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_abstol">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_abstol">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_abstol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the absolute tolerance of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_abstol(0)</span>
+<span class="sd">        0.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">abstol</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">abstol</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_abstol">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_abstol">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_abstol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">abstol</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the absolute tolerance of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        abstol should be a float. When specifying a new value, the same</span>
+<span class="sd">        limits apply as with the</span>
+<span class="sd">        Cplex.parameters.mip.tolerances.absmipgap parameter. See the</span>
+<span class="sd">        section on Specifying multiple objective problems in the CPLEX</span>
+<span class="sd">        User&#39;s Manual for the details on the meaning of this tolerance.</span>
+
+<span class="sd">        See `CPXmultiobjchgattribs &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjchgattribs.html&gt;`_ in the Callable Library</span>
+<span class="sd">        Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_abstol(0, 1e-6)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_abstol(0)</span>
+<span class="sd">        1e-06</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjchgattribs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                 <span class="n">objidx</span><span class="p">,</span> <span class="n">abstol</span><span class="o">=</span><span class="n">abstol</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.get_reltol">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.get_reltol">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_reltol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the relative tolerance of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_reltol(0)</span>
+<span class="sd">        0.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">reltol</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reltol</span></div>
+
+
+<div class="viewcode-block" id="MultiObjInterface.set_reltol">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._multiobj.MultiObjInterface.set_reltol">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_reltol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objidx</span><span class="p">,</span> <span class="n">reltol</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the relative tolerance of an objective function.</span>
+
+<span class="sd">        objidx must be an objective name or index.</span>
+
+<span class="sd">        reltol should be a float. When specifying a new value, the same</span>
+<span class="sd">        limits apply as with the Cplex.parameters.mip.tolerances.mipgap</span>
+<span class="sd">        parameter. Note that a nondefault setting of this parameter only</span>
+<span class="sd">        applies to MIP multiobjective problems. See the section on</span>
+<span class="sd">        Specifying multiple objective problems in the CPLEX User&#39;s Manual</span>
+<span class="sd">        for the details on the meaning of this tolerance.</span>
+
+<span class="sd">        See `CPXmultiobjchgattribs &lt;https://www.ibm.com/docs/en/SSSA5P_22.1.2/ilog.odms.cplex.help/refcallablelibrary/cpxapi/multiobjchgattribs.html&gt;`_ in the Callable Library</span>
+<span class="sd">        Reference Manual for more detail.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; indices = c.variables.add(obj=[1.0 for i in range(3)])</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.set_reltol(0, 1e-4)</span>
+<span class="sd">        &gt;&gt;&gt; c.multiobj.get_reltol(0)</span>
+<span class="sd">        0.0001</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">objidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv</span><span class="p">(</span><span class="n">objidx</span><span class="p">)</span>
+        <span class="n">_proc</span><span class="o">.</span><span class="n">multiobjchgattribs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                 <span class="n">objidx</span><span class="p">,</span> <span class="n">reltol</span><span class="o">=</span><span class="n">reltol</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._multiobj</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+<map id="inheritance4ee4b32793" name="inheritance4ee4b32793">
+<area shape="rect" id="node1" href="#cplex.constant_class.ConstantClass" target="_top" title="A base class for classes that contain groups of constants." alt="" coords="5,5,114,32"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.CutType" target="_top" title="Arguments to MIPInfoCallback.get_num_cuts()." alt="" coords="24,80,96,107"/>
+</map>

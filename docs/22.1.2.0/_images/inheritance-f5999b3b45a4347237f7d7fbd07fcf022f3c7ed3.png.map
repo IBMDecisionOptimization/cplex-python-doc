@@ -1,0 +1,4 @@
+<map id="inheritance3d0195dd63" name="inheritance3d0195dd63">
+<area shape="rect" id="node1" href="#cplex._internal._parameter_classes.NumParameter" target="_top" title="Class for integer and float parameters." alt="" coords="5,80,115,107"/>
+<area shape="rect" id="node2" href="#cplex._internal._parameter_classes.Parameter" target="_top" title="Base class for Cplex parameters." alt="" coords="19,5,101,32"/>
+</map>

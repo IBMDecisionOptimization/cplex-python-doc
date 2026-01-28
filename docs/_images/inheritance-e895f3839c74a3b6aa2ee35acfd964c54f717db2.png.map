@@ -1,0 +1,4 @@
+<map id="inheritance098913900b" name="inheritance098913900b">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="31,5,133,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.SolnPoolFilterInterface" target="_top" title="Methods for solution pool filters." alt="" coords="5,80,159,107"/>
+</map>

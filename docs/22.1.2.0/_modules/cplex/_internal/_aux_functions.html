@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._aux_functions &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._aux_functions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._aux_functions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _aux_functions.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Internal auxiliary functions.&quot;&quot;&quot;</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">collections_abc</span>  <span class="c1"># For Python &gt;= 3.3</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">collections_abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">CplexError</span><span class="p">,</span> <span class="n">WrongNumberOfArgumentsError</span>
+
+<span class="n">CPLEX_PY_DISABLE_NAME_CONV</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CPLEX_PY_DISABLE_NAME_CONV&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="deprecated">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.deprecated">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">deprecated</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A decorator that marks methods/functions as deprecated.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="deprecated.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.deprecated.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls_or_func</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">cls_or_func</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">cls_or_func</span><span class="p">)):</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> function or method&quot;</span>
+        <span class="c1"># NOTE: Doesn&#39;t work for classes .. haven&#39;t figured that out yet.</span>
+        <span class="c1">#       Specifically, when a decorated class is used as a base</span>
+        <span class="c1">#       class.</span>
+        <span class="c1"># elif inspect.isclass(cls_or_func):</span>
+        <span class="c1">#     fmt = &quot;{0} class&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">cls_or_func</span><span class="p">))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">_getdeprecatedmsg</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cls_or_func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">cls_or_func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cls_or_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wrapped</span></div>
+
+
+
+<div class="viewcode-block" id="deprecated_class">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.deprecated_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">deprecated_class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Emits a warning for a deprecated class.</span>
+
+<span class="sd">    This should be called in __init__.</span>
+
+<span class="sd">    name - the name of the class (e.g., PresolveCallback).</span>
+
+<span class="sd">    version - the version at which the class was deprecated (e.g.,</span>
+<span class="sd">              &quot;V12.7.1&quot;).</span>
+
+<span class="sd">    stacklevel - indicates how many levels up the stack is the caller.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">_getdeprecatedmsg</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> class&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">version</span><span class="p">)</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">stacklevel</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_getdeprecatedmsg</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;the </span><span class="si">{0}</span><span class="s2"> is deprecated since </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="max_arg_length">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.max_arg_length">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">max_arg_length</span><span class="p">(</span><span class="n">arg_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the max length of the arguments in arg_list.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arg_list</span><span class="p">])</span></div>
+
+
+
+<span class="k">if</span> <span class="n">__debug__</span><span class="p">:</span>
+
+    <span class="c1"># With non-optimzied bytecode, validate_arg_lengths actually does</span>
+    <span class="c1"># something.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_arg_lengths</span><span class="p">(</span><span class="n">arg_list</span><span class="p">,</span> <span class="n">allow_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra_msg</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks for equivalent argument lengths.</span>
+
+<span class="sd">        If allow_empty is True (the default), then empty arguments are not</span>
+<span class="sd">        checked against the max length of non-empty arguments. Some functions</span>
+<span class="sd">        allow NULL arguments in the Callable Library, for example.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arg_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arg_list</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">allow_empty</span><span class="p">:</span>
+            <span class="n">arg_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arg_lengths</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">arg_lengths</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">arg_lengths</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">arg_length</span> <span class="ow">in</span> <span class="n">arg_lengths</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arg_length</span> <span class="o">!=</span> <span class="n">max_length</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CplexError</span><span class="p">(</span><span class="s2">&quot;inconsistent argument lengths&quot;</span> <span class="o">+</span> <span class="n">extra_msg</span><span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+<div class="viewcode-block" id="validate_arg_lengths">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.validate_arg_lengths">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_arg_lengths</span><span class="p">(</span>
+            <span class="n">arg_list</span><span class="p">,</span>
+            <span class="n">allow_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">extra_msg</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A no-op.</span>
+
+<span class="sd">        A no-op if using python -O or the PYTHONOPTIMIZE environment</span>
+<span class="sd">        variable is defined as a non-empty string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="make_ranges">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.make_ranges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_ranges</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+        <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">indices</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">indices</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">indices</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">i</span></div>
+
+
+
+<div class="viewcode-block" id="identity">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.identity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">identity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple identity function.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<div class="viewcode-block" id="apply_freeform_two_args">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.apply_freeform_two_args">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_freeform_two_args</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unpack_single</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">conv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">identity</span>
+    <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">conarg0</span><span class="p">,</span> <span class="n">conarg1</span> <span class="o">=</span> <span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conarg1</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="n">conarg1</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expecting names or indices&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                <span class="n">fn</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">make_ranges</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))))</span>
+        <span class="n">conarg0</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="n">conarg0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unpack_single</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expecting name or index&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">WrongNumberOfArgumentsError</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="apply_freeform_one_arg">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.apply_freeform_one_arg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_freeform_one_arg</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">maxval</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">conv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">identity</span>
+    <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">conarg0</span><span class="p">,</span> <span class="n">conarg1</span> <span class="o">=</span> <span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conarg1</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="n">conarg1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expecting names or indices&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">conarg0</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conarg0</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">conarg0</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expecting name or index&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">apply_freeform_one_arg</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                                      <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">maxval</span><span class="p">)),))</span>
+    <span class="k">raise</span> <span class="n">WrongNumberOfArgumentsError</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="apply_pairs">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.apply_pairs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_pairs</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+    <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">fn</span><span class="p">([</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span> <span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="n">unzip</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># NB: If pair is empty, then we do nothing.</span>
+        <span class="k">if</span> <span class="n">pair</span><span class="p">:</span>
+            <span class="n">fn</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span>
+    <span class="k">raise</span> <span class="n">WrongNumberOfArgumentsError</span><span class="p">(</span><span class="n">nargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="delete_set_by_range">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.delete_set_by_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_set_by_range</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">max_num</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+    <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Delete All:</span>
+        <span class="k">if</span> <span class="n">max_num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fn</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Delete all items from a possibly unordered list of mixed types:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">listify</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">ranges</span> <span class="o">=</span> <span class="n">make_ranges</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ranges</span><span class="p">)):</span>
+            <span class="n">fn</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Delete range from arg[0] to arg[1]:</span>
+        <span class="n">fn</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">WrongNumberOfArgumentsError</span><span class="p">()</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_group</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Object to contain constraint groups&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for the _group object</span>
+
+<span class="sd">        gp is a list of tuples of length two (the first entry of which</span>
+<span class="sd">        is the preference for the group (a float), the second of which</span>
+<span class="sd">        is a tuple of pairs (type, id), where type is an attribute of</span>
+<span class="sd">        conflict.constraint_type and id is either an index or a valid</span>
+<span class="sd">        name for the type).</span>
+
+<span class="sd">        Example input: [(1.0, ((2, 0),)), (1.0, ((3, 0), (3, 1)))]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gp</span> <span class="o">=</span> <span class="n">gp</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gp</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="make_group">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.make_group">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_group</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="n">max_num</span><span class="p">,</span> <span class="n">c_type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a _group object</span>
+
+<span class="sd">    input:</span>
+<span class="sd">    conv    - a function that will convert names to indices</span>
+<span class="sd">    max_num - number of existing constraints of a given type</span>
+<span class="sd">    c_type  - constraint type</span>
+<span class="sd">    args    - arbitrarily many arguments (see description below)</span>
+
+<span class="sd">    If args is empty, every constraint/bound is assigned weight 1.0.</span>
+
+<span class="sd">    If args is of length one or more, every constraint/bound is assigned</span>
+<span class="sd">    a weight equal to the float passed in as the first item.</span>
+
+<span class="sd">    If args contains additional items, they determine a subset of</span>
+<span class="sd">    constraints/bounds to be included.  If one index or name is</span>
+<span class="sd">    specified, it is the only one that will be included.  If two indices</span>
+<span class="sd">    or names are specified, all constraints between the first and the</span>
+<span class="sd">    second, inclusive, will be included.  If a sequence of names or</span>
+<span class="sd">    indices is passed in, all of their constraints/bounds will be</span>
+<span class="sd">    included.</span>
+
+<span class="sd">    See example usage in _subinterfaces.ConflictInterface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">max_num</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="n">listify</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">conv</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_group</span><span class="p">([(</span><span class="n">weight</span><span class="p">,</span> <span class="p">((</span><span class="n">c_type</span><span class="p">,</span> <span class="n">i</span><span class="p">),))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cons</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="init_list_args">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.init_list_args">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_list_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize default arguments with empty lists if necessary.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([]</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="listify">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.listify">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">listify</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns [x] if x isn&#39;t already a list.</span>
+
+<span class="sd">    This is used to wrap arguments for functions that require lists.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Assumes name to index conversions already done.</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">iter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cachelookup</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="p">,</span> <span class="n">cache</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">getindexfunc</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="n">cache</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+    <span class="k">return</span> <span class="n">idx</span>
+
+
+<span class="c1"># If the CPLEX_PY_DISABLE_NAME_CONV environment variable is defined,</span>
+<span class="c1"># we will skip name-to-index conversion (i.e., these functions become</span>
+<span class="c1"># no-ops), which can improve performance.</span>
+<span class="k">if</span> <span class="n">CPLEX_PY_DISABLE_NAME_CONV</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_sequence</span><span class="p">(</span>
+            <span class="n">seq</span><span class="p">,</span>
+            <span class="n">getindexfunc</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns seq immediately.</span>
+
+<span class="sd">        See comments about CPLEX_PY_DISABLE_NAME_CONV.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">seq</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">getindexfunc</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns name immediately.</span>
+
+<span class="sd">        See comments about CPLEX_PY_DISABLE_NAME_CONV.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">name</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="c1"># By default (i.e., if the CPLEX_PY_DISABLE_NAME_CONV environment</span>
+    <span class="c1"># variable is not defined), these functions perform name-to-index</span>
+    <span class="c1"># conversion, which can hurt performance.</span>
+
+<div class="viewcode-block" id="convert_sequence">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.convert_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_sequence</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a sequence of names to indices as necessary.</span>
+
+<span class="sd">        If you are calling `convert` (see below) in a tight loop, but you</span>
+<span class="sd">        know that you are always working with a sequence, then it can be</span>
+<span class="sd">        more efficient to call this method directly (there is no overhead</span>
+<span class="sd">        checking if it is a sequence).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">_cachelookup</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="convert">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.convert">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts from names to indices as necessary.</span>
+
+<span class="sd">        If name is a string, an index is returned.</span>
+
+<span class="sd">        If name is a sequence, a sequence of indices is returned.</span>
+
+<span class="sd">        If name is neither (i.e., it&#39;s an integer), then that is returned</span>
+<span class="sd">        as is.</span>
+
+<span class="sd">        getindexfunc is a function that takes a name and returns an index.</span>
+
+<span class="sd">        The optional cache argument allows for further localized</span>
+<span class="sd">        caching (e.g., within a loop).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># In some cases, it can be benficial to cache lookups.</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_cachelookup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">collections_abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+            <span class="c1"># It&#39;s tempting to use a recursive solution here, but that kills</span>
+            <span class="c1"># performance for the case where all indices are passed in (i.e.,</span>
+            <span class="c1"># no names). This is due to the fact that we end up doing the</span>
+            <span class="c1"># extra check for sequence types over and over (above).</span>
+            <span class="k">return</span> <span class="n">convert_sequence</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">getindexfunc</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+
+
+<div class="viewcode-block" id="unzip">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._aux_functions.unzip">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unzip</span><span class="p">(</span><span class="n">iterable</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Inverse of the zip function.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; z = list(zip([1, 2, 3], [4, 5, 6]))</span>
+<span class="sd">    &gt;&gt;&gt; unzip(z)</span>
+<span class="sd">    [(1, 2, 3), (4, 5, 6)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">iterable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">iterable</span><span class="p">))</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._aux_functions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

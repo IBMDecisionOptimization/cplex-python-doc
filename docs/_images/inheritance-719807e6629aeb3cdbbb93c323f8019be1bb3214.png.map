@@ -1,0 +1,6 @@
+<map id="inheritanceed116f6c6b" name="inheritanceed116f6c6b">
+<area shape="rect" id="node1" href="#cplex.callbacks.Callback" target="_top" title="Base class for Cplex callback classes." alt="" coords="42,5,114,32"/>
+<area shape="rect" id="node3" href="#cplex.callbacks.OptimizationCallback" target="_top" title="Base class for Cplex optimization callback classes." alt="" coords="5,80,151,107"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.ContinuousCallback" target="_top" title="Subclassable class for Cplex continuous callbacks." alt="" coords="9,155,147,181"/>
+<area shape="rect" id="node4" href="#cplex.callbacks.SimplexCallback" target="_top" title="Subclassable class for Cplex simplex callback classes." alt="" coords="18,229,138,256"/>
+</map>

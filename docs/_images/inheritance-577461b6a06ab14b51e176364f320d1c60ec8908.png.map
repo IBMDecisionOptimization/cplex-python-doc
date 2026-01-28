@@ -1,0 +1,8 @@
+<map id="inheritance8fdb682075" name="inheritance8fdb682075">
+<area shape="rect" id="node1" href="#cplex.callbacks.Callback" target="_top" title="Base class for Cplex callback classes." alt="" coords="42,5,114,32"/>
+<area shape="rect" id="node6" href="#cplex.callbacks.OptimizationCallback" target="_top" title="Base class for Cplex optimization callback classes." alt="" coords="5,80,151,107"/>
+<area shape="rect" id="node2" href="#cplex.callbacks.ControlCallback" target="_top" title="Base class for Cplex MIP control callback classes." alt="" coords="21,304,135,331"/>
+<area shape="rect" id="node4" href="#cplex.callbacks.HSCallback" target="_top" title="Base class for heuristic and solve callback classes." alt="" coords="32,379,124,405"/>
+<area shape="rect" id="node3" href="#cplex.callbacks.MIPCallback" target="_top" title="Subclassable class for MIP callback classes." alt="" coords="30,229,126,256"/>
+<area shape="rect" id="node5" href="#cplex.callbacks.MIPInfoCallback" target="_top" title="Subclassable class for MIP informational callback classes." alt="" coords="19,155,137,181"/>
+</map>

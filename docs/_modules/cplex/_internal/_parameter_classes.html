@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cplex._internal._parameter_classes &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/ibm_python.css?v=c2bec650" />
+    
+    <script src="../../../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" accesskey="U">cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._parameter_classes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cplex._internal._parameter_classes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># File: _parameter_classes.py</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Licensed Materials - Property of IBM</span>
+<span class="c1"># 5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21</span>
+<span class="c1"># Copyright IBM Corporation 2008, 2024. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># US Government Users Restricted Rights - Use, duplication or</span>
+<span class="c1"># disclosure restricted by GSA ADP Schedule Contract with</span>
+<span class="c1"># IBM Corp.</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Parameters for the CPLEX Python API.</span>
+
+<span class="sd">This module defines classes for parameters, groups of parameters, and</span>
+<span class="sd">parameter constants used in the CPLEX Python API.  For more detail, see also</span>
+<span class="sd">the corresponding commands of the Interactive Optimizer documented in the</span>
+<span class="sd">CPLEX Parameters Reference Manual.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._aux_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_list_args</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_procedural</span> <span class="k">as</span> <span class="n">CPX_PROC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">CplexError</span><span class="p">,</span> <span class="n">CplexSolverError</span><span class="p">,</span> <span class="n">error_codes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..paramset</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterSet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..constant_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantClass</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_info_wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to lazily load parameter info.</span>
+
+<span class="sd">    We have to lazily load parameter info in several methods of the</span>
+<span class="sd">    Parameter class. This decorator makes it easy and consistent to do</span>
+<span class="sd">    this.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># First, lazily load parameter info if necc.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">()</span>
+        <span class="c1"># Then call the function.</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrap</span>
+
+
+<div class="viewcode-block" id="Parameter">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Parameter</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Cplex parameters.</span>
+
+<span class="sd">    :undocumented: __init__</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Parameter.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">about</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_help</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">about</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">constants</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">constants</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_info</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># self._defval gets set lazily by self._get_info().</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defval</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Parameter.__repr__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the parameter within the hierarchy.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">])</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the validity of the parameter value.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<div class="viewcode-block" id="Parameter.set">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the parameter to value.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="c1"># Replace ugly TypeError message from the SWIG layer with</span>
+            <span class="c1"># something more informative.</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;invalid parameter value: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Parameter.get">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current value of the parameter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Parameter.reset">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the parameter to its default value.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">())</span>
+        <span class="k">except</span> <span class="n">CplexSolverError</span> <span class="k">as</span> <span class="n">cse</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_CPUMASK</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="n">cse</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">error_codes</span><span class="o">.</span><span class="n">CPXERR_UNSUPPORTED_OPERATION</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lazily load the default, min, and max values.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<div class="viewcode-block" id="Parameter.default">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.default">[docs]</a>
+    <span class="nd">@_get_info_wrapper</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the default value of the parameter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defval</span></div>
+
+
+<div class="viewcode-block" id="Parameter.type">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the type of the parameter.</span>
+
+<span class="sd">        Allowed types are float, int, and str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Parameter.help">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.Parameter.help">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">help</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the documentation for the parameter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_help</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NumParameter">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.NumParameter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NumParameter</span><span class="p">(</span><span class="n">Parameter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for integer and float parameters.</span>
+
+<span class="sd">    :undocumented: __init__</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@_get_info_wrapper</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the validity of the parameter value.&quot;&quot;&quot;</span>
+        <span class="c1"># As we define a special min value for CPX_PARAM_CLONELOG in the Python API</span>
+        <span class="c1"># we have to have special handling for it.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_CLONELOG</span> <span class="ow">and</span>
+                <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minval</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid </span><span class="si">{0}</span><span class="s2"> parameter value: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lazily load the default, min, and max values.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_info</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_info</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_defval</span><span class="p">,</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_minval</span><span class="p">,</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_maxval</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
+        <span class="c1"># Override some default values for the Python API.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_CLONELOG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_minval</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_DATACHECK</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defval</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DATACHECK_WARN</span>
+
+<div class="viewcode-block" id="NumParameter.min">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.NumParameter.min">[docs]</a>
+    <span class="nd">@_get_info_wrapper</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the minimum value for the parameter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minval</span></div>
+
+
+<div class="viewcode-block" id="NumParameter.max">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.NumParameter.max">[docs]</a>
+    <span class="nd">@_get_info_wrapper</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the maximum value for the parameter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxval</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StrParameter">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.StrParameter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StrParameter</span><span class="p">(</span><span class="n">Parameter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for string parameters.</span>
+
+<span class="sd">    :undocumented: __init__</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the validity of the parameter value.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lazily load the default value.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">          For string parameters there is no min and max value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_info</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_info</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ParameterGroup">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParameterGroup</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class containing a group of Cplex parameters.</span>
+
+<span class="sd">    :undocumented: __init__</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ParameterGroup.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">members</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">proxy</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="c1"># self._name gets set dynamically below when we call</span>
+        <span class="c1"># self.__dict__.update() (see _parameter_hierarchy.py).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">members</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ParameterGroup.__repr__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the parameter group within the hierarchy.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ParameterGroup.reset">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the parameters in the group to their default values.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="p">(</span><span class="n">ParameterGroup</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">))</span> <span class="ow">and</span>
+                    <span class="n">member</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">):</span>
+                <span class="n">member</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filterfunc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">ParameterGroup</span><span class="p">)</span> <span class="ow">and</span> <span class="n">member</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">:</span>
+                <span class="n">retval</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">_get_params</span><span class="p">(</span><span class="n">filterfunc</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">filterfunc</span><span class="p">(</span><span class="n">member</span><span class="p">):</span>
+                    <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">member</span><span class="p">,</span> <span class="n">member</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">retval</span>
+
+<div class="viewcode-block" id="ParameterGroup.get_changed">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup.get_changed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of the changed parameters in the group.</span>
+
+<span class="sd">        Returns a list of (parameter, value) pairs.  Each parameter is</span>
+<span class="sd">        an instance of the Parameter class, and thus the parameter</span>
+<span class="sd">        value can be changed via its set method, or this object can be</span>
+<span class="sd">        passed to the tuning functions.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.read.datacheck.set(</span>
+<span class="sd">        ...     c.parameters.read.datacheck.values.assist)</span>
+<span class="sd">        &gt;&gt;&gt; for parameter, value in c.parameters.get_changed():</span>
+<span class="sd">        ...     pass  # do something</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_params</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ParameterGroup.get_all">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of all the parameters in the group.</span>
+
+<span class="sd">        Returns a list of (parameter, value) pairs.  Each parameter is</span>
+<span class="sd">        an instance of the Parameter class, and thus the parameter</span>
+<span class="sd">        value can be changed via its set method, or this object can be</span>
+<span class="sd">        passed to the tuning functions.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; for parameter, value in c.parameters.get_all():</span>
+<span class="sd">        ...     pass  # do something</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_params</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TuningConstants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.TuningConstants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuningConstants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status codes returned by tuning methods.</span>
+
+<span class="sd">    For an explanation of tuning, see that topic in</span>
+<span class="sd">    the CPLEX User&#39;s Manual.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">completed</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># There is no constant for this.</span>
+    <span class="n">abort</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_TUNE_ABORT</span>
+    <span class="n">time_limit</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_TUNE_TILIM</span>
+    <span class="n">dettime_limit</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_TUNE_DETTILIM</span></div>
+
+
+
+<div class="viewcode-block" id="RootParameterGroup">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RootParameterGroup</span><span class="p">(</span><span class="n">ParameterGroup</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class containing all the Cplex parameters.</span>
+
+<span class="sd">    :undocumented: __init__, _set, _get, _get_info</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tuning_status</span> <span class="o">=</span> <span class="n">TuningConstants</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See `TuningConstants()`&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RootParameterGroup.__init__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">members</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">members</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">members</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># At the C-level, the apiencoding parameter is always UTF-8 in</span>
+        <span class="c1"># the Python API.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_APIENCODING</span><span class="p">,</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
+                  <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_STRING</span><span class="p">)</span>
+        <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">fixparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_APIENCODING</span><span class="p">)</span>
+        <span class="c1"># Turn off access to presolved problem in callbacks in the Python API.</span>
+        <span class="c1"># CPX_PARAM_MIPCBREDLP is hidden so we have to set it via the</span>
+        <span class="c1"># parameter ID.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_MIPCBREDLP</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_INT</span><span class="p">)</span>
+        <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">fixparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_MIPCBREDLP</span><span class="p">)</span>
+        <span class="c1"># Fix CPX_PARAM_SCRIND to &quot;off&quot; (see RTC-36832).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_SCRIND</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_OFF</span><span class="p">,</span>
+                  <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_INT</span><span class="p">)</span>
+        <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">fixparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_SCRIND</span><span class="p">)</span>
+        <span class="c1"># By default, the datacheck parameter is &quot;on&quot; in the Python API.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">datacheck</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DATACHECK_WARN</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RootParameterGroup.reset">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the parameters in the group to their default values.&quot;&quot;&quot;</span>
+        <span class="c1"># Rather than calling ParameterGroup.reset(self), we can just</span>
+        <span class="c1"># reset using CPXXsetdefaults, which should be much faster. We</span>
+        <span class="c1"># still allow users to call reset() on individual parameters or</span>
+        <span class="c1"># parameter groups, though.</span>
+        <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">setdefaults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">)</span>
+        <span class="c1"># By default, the datacheck parameter is &quot;on&quot; in the Python API.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">datacheck</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DATACHECK_WARN</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RootParameterGroup.__repr__">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return &#39;parameters&#39;.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">paramtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># RTC-34595</span>
+        <span class="k">if</span> <span class="n">paramtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">paramtype</span> <span class="o">=</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getparamtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span>
+                                              <span class="n">which_parameter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">paramtype</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_INT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># will upconvert to long, if necc.</span>
+            <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">setintparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">paramtype</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_DOUBLE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">setdblparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">paramtype</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_STRING</span><span class="p">:</span>
+            <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">setstrparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">paramtype</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_LONG</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># will upconvert to long, if necc.</span>
+            <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">setlongparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">paramtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># RTC-34595</span>
+        <span class="k">if</span> <span class="n">paramtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">paramtype</span> <span class="o">=</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getparamtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span>
+                                              <span class="n">which_parameter</span><span class="p">)</span>
+        <span class="n">switcher</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_INT</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getintparam</span><span class="p">,</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_DOUBLE</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getdblparam</span><span class="p">,</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_STRING</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getstrparam</span><span class="p">,</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_LONG</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getlongparam</span>
+        <span class="p">}</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">switcher</span><span class="p">[</span><span class="n">paramtype</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">,</span> <span class="n">paramtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># RTC-34595</span>
+        <span class="k">if</span> <span class="n">paramtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">paramtype</span> <span class="o">=</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getparamtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span>
+                                              <span class="n">which_parameter</span><span class="p">)</span>
+        <span class="n">switcher</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_INT</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">infointparam</span><span class="p">,</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_DOUBLE</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">infodblparam</span><span class="p">,</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_STRING</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">infostrparam</span><span class="p">,</span>
+            <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_LONG</span><span class="p">:</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">infolongparam</span>
+        <span class="p">}</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">switcher</span><span class="p">[</span><span class="n">paramtype</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">which_parameter</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_fixed_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_parameters_and_values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fixed_parameters_and_values</span><span class="p">,</span> <span class="n">ParameterSet</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fixed_parameters_and_values</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_pslst</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;parameter set must have been created&quot;</span>
+                                 <span class="s2">&quot; by this CPLEX problem object&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span>  <span class="c1"># done checking</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># guilty until proven innocent</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">paramset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fixed_parameters_and_values</span><span class="p">:</span>
+                <span class="n">param_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">_type</span>
+                <span class="k">if</span> <span class="n">param_id</span> <span class="ow">in</span> <span class="n">paramset</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CplexError</span><span class="p">(</span><span class="s2">&quot;duplicate parameters detected&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">paramset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">param_id</span><span class="p">)</span>
+            <span class="c1"># If we can iterate over fixed_parameters_and_values and</span>
+            <span class="c1"># access the _id and _type attributes of the parameters,</span>
+            <span class="c1"># then it&#39;s considered valid.</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;invalid fixed_parameters_and_values arg detected&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_fixed_args_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">ParameterSet</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">param_id</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">get_ids</span><span class="p">():</span>
+                <span class="n">param_type</span> <span class="o">=</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">getparamtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">param_id</span><span class="p">)</span>
+                <span class="n">param_value</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param_id</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">param_type</span><span class="p">,</span> <span class="n">param_value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">param</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">_type</span><span class="p">,</span> <span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_fixed_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_parameters_and_values</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;non-public&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">__debug__</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_fixed_args</span><span class="p">(</span><span class="n">fixed_parameters_and_values</span><span class="p">)</span>
+        <span class="n">int_params_and_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dbl_params_and_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">str_params_and_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">has_datacheck</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">param_id</span><span class="p">,</span> <span class="n">param_type</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fixed_args_iter</span><span class="p">(</span>
+                <span class="n">fixed_parameters_and_values</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">param_id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_DATACHECK</span><span class="p">:</span>
+                <span class="n">has_datacheck</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">param_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_INT</span><span class="p">,</span>
+                              <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_LONG</span><span class="p">):</span>
+                <span class="n">int_params_and_values</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">param_id</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">param_type</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_DOUBLE</span><span class="p">:</span>
+                <span class="n">dbl_params_and_values</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">param_id</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">param_type</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAMTYPE_STRING</span><span class="p">,</span> \
+                    <span class="s2">&quot;unexpected parameter type&quot;</span>
+                <span class="n">str_params_and_values</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">param_id</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="c1"># In the Python API, the datacheck parameter defaults to &quot;on&quot;.</span>
+        <span class="c1"># When calling the tuning functions the datacheck parameter can</span>
+        <span class="c1"># be changed as a side effect. Here, we ensure that the value of</span>
+        <span class="c1"># the datacheck parameter is the same before and after. That is,</span>
+        <span class="c1"># _unless_ the user overrides it here, explicitly, by passing the</span>
+        <span class="c1"># datacheck parameter in as a fixed parameter.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_datacheck</span><span class="p">:</span>
+            <span class="n">int_params_and_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARAM_DATACHECK</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">datacheck</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">int_params_and_values</span><span class="p">,</span> <span class="n">dbl_params_and_values</span><span class="p">,</span>
+                <span class="n">str_params_and_values</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RootParameterGroup.tune_problem_set">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.tune_problem_set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tune_problem_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">filetypes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">fixed_parameters_and_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tunes parameters for a set of problems.</span>
+
+<span class="sd">        filenames must be a sequence of strings specifying a set of</span>
+<span class="sd">        problems to tune.</span>
+
+<span class="sd">        If filetypes is given, it must be a sequence of the same</span>
+<span class="sd">        length as filenames also consisting of strings that specify</span>
+<span class="sd">        the types of the corresponding files.</span>
+
+<span class="sd">        If fixed_parameters_and_values is given, it may be either a</span>
+<span class="sd">        ParameterSet instance or a sequence of sequences of length 2</span>
+<span class="sd">        containing instances of the Parameter class that are to be fixed</span>
+<span class="sd">        during the tuning process and the values at which they are to be</span>
+<span class="sd">        fixed.</span>
+
+<span class="sd">        tune_problem_set returns the status of the tuning procedure,</span>
+<span class="sd">        which is an attribute of parameters.tuning_status.</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_results_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_log_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.lpmethod,</span>
+<span class="sd">        ...        c.parameters.lpmethod.values.auto)</span>
+<span class="sd">        &gt;&gt;&gt; status = c.parameters.tune_problem_set(</span>
+<span class="sd">        ...     filenames=[&quot;lpex.mps&quot;, &quot;example.mps&quot;],</span>
+<span class="sd">        ...     fixed_parameters_and_values=ps)</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.tuning_status[status]</span>
+<span class="sd">        &#39;completed&#39;</span>
+<span class="sd">        &gt;&gt;&gt; status = c.parameters.tune_problem_set(</span>
+<span class="sd">        ...     filenames=[&quot;lpex.mps&quot;, &quot;example.mps&quot;],</span>
+<span class="sd">        ...     fixed_parameters_and_values=[</span>
+<span class="sd">        ...         (c.parameters.lpmethod,</span>
+<span class="sd">        ...          c.parameters.lpmethod.values.auto)])</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.tuning_status[status]</span>
+<span class="sd">        &#39;completed&#39;</span>
+<span class="sd">        &gt;&gt;&gt; status = c.parameters.tune_problem_set(</span>
+<span class="sd">        ...     filenames=[&quot;lpex.mps&quot;, &quot;example.mps&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.tuning_status[status]</span>
+<span class="sd">        &#39;completed&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filetypes</span><span class="p">,</span> <span class="n">fixed_parameters_and_values</span> <span class="o">=</span> <span class="n">init_list_args</span><span class="p">(</span>
+            <span class="n">filetypes</span><span class="p">,</span> <span class="n">fixed_parameters_and_values</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">int_params_and_values</span><span class="p">,</span>
+         <span class="n">dbl_params_and_values</span><span class="p">,</span>
+         <span class="n">str_params_and_values</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_fixed_args</span><span class="p">(</span>
+             <span class="n">fixed_parameters_and_values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">tuneparamprobset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span>
+                                         <span class="n">filenames</span><span class="p">,</span> <span class="n">filetypes</span><span class="p">,</span>
+                                         <span class="n">int_params_and_values</span><span class="p">,</span>
+                                         <span class="n">dbl_params_and_values</span><span class="p">,</span>
+                                         <span class="n">str_params_and_values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RootParameterGroup.tune_problem">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.tune_problem">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tune_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_parameters_and_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tunes parameters for a Cplex problem.</span>
+
+<span class="sd">        If fixed_parameters_and_values is given, it may be either a</span>
+<span class="sd">        ParameterSet instance or a sequence of sequences of length 2</span>
+<span class="sd">        containing instances of the Parameter class that are to be fixed</span>
+<span class="sd">        during the tuning process and the values at which they are to be</span>
+<span class="sd">        fixed.</span>
+
+<span class="sd">        tune_problem returns the status of the tuning procedure, which</span>
+<span class="sd">        is an attribute of parameters.tuning_status.</span>
+
+<span class="sd">        &gt;&gt;&gt; import cplex</span>
+<span class="sd">        &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="sd">        &gt;&gt;&gt; out = c.set_results_stream(None)</span>
+<span class="sd">        &gt;&gt;&gt; ps = c.create_parameter_set()</span>
+<span class="sd">        &gt;&gt;&gt; ps.add(c.parameters.lpmethod,</span>
+<span class="sd">        ...        c.parameters.lpmethod.values.auto)</span>
+<span class="sd">        &gt;&gt;&gt; status = c.parameters.tune_problem(ps)</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.tuning_status[status]</span>
+<span class="sd">        &#39;completed&#39;</span>
+<span class="sd">        &gt;&gt;&gt; status = c.parameters.tune_problem([</span>
+<span class="sd">        ...     (c.parameters.lpmethod,</span>
+<span class="sd">        ...      c.parameters.lpmethod.values.auto)])</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.tuning_status[status]</span>
+<span class="sd">        &#39;completed&#39;</span>
+<span class="sd">        &gt;&gt;&gt; status = c.parameters.tune_problem()</span>
+<span class="sd">        &gt;&gt;&gt; c.parameters.tuning_status[status]</span>
+<span class="sd">        &#39;completed&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">fixed_parameters_and_values</span><span class="p">,)</span> <span class="o">=</span> <span class="n">init_list_args</span><span class="p">(</span>
+            <span class="n">fixed_parameters_and_values</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">int_params_and_values</span><span class="p">,</span>
+         <span class="n">dbl_params_and_values</span><span class="p">,</span>
+         <span class="n">str_params_and_values</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_fixed_args</span><span class="p">(</span>
+             <span class="n">fixed_parameters_and_values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">tuneparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cplex</span><span class="o">.</span><span class="n">_lp</span><span class="p">,</span>
+                                  <span class="n">int_params_and_values</span><span class="p">,</span>
+                                  <span class="n">dbl_params_and_values</span><span class="p">,</span>
+                                  <span class="n">str_params_and_values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RootParameterGroup.read_file">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.read_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads a set of parameters from the file filename.&quot;&quot;&quot;</span>
+        <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">readcopyparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RootParameterGroup.write_file">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.RootParameterGroup.write_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes a set of parameters to the file filename.&quot;&quot;&quot;</span>
+        <span class="n">CPX_PROC</span><span class="o">.</span><span class="n">writeparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">_e</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="off_on_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.off_on_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">off_on_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">off</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_OFF</span>
+    <span class="n">on</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ON</span></div>
+
+
+
+<div class="viewcode-block" id="auto_off_on_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.auto_off_on_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">auto_off_on_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_AUTO</span>
+    <span class="n">off</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_OFF</span>
+    <span class="n">on</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ON</span></div>
+
+
+
+<div class="viewcode-block" id="writelevel_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.writelevel_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">writelevel_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_WRITELEVEL_AUTO</span>
+    <span class="n">all_variables</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_WRITELEVEL_ALLVARS</span>
+    <span class="n">discrete_variables</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_WRITELEVEL_DISCRETEVARS</span>
+    <span class="n">nonzero_variables</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_WRITELEVEL_NONZEROVARS</span>
+    <span class="n">nonzero_discrete_variables</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_WRITELEVEL_NONZERODISCRETEVARS</span></div>
+
+
+
+<div class="viewcode-block" id="scale_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.scale_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">scale_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">equilibration</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">aggressive</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="mip_emph_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.mip_emph_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">mip_emph_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">balanced</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPEMPHASIS_BALANCED</span>
+    <span class="n">optimality</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPEMPHASIS_OPTIMALITY</span>
+    <span class="n">feasibility</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPEMPHASIS_FEASIBILITY</span>
+    <span class="n">best_bound</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPEMPHASIS_BESTBOUND</span>
+    <span class="n">hidden_feasibility</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPEMPHASIS_HIDDENFEAS</span>
+    <span class="n">heuristic</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPEMPHASIS_HEURISTIC</span></div>
+
+
+
+<div class="viewcode-block" id="brdir_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.brdir_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">brdir_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">down</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BRDIR_DOWN</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BRDIR_AUTO</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BRDIR_UP</span></div>
+
+
+
+<div class="viewcode-block" id="search_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.search_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">search_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPSEARCH_AUTO</span>
+    <span class="n">traditional</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPSEARCH_TRADITIONAL</span>
+    <span class="n">dynamic</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPSEARCH_DYNAMIC</span></div>
+
+
+
+<div class="viewcode-block" id="subalg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.subalg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">subalg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_AUTOMATIC</span>
+    <span class="n">primal</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_PRIMAL</span>
+    <span class="n">dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_DUAL</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_NET</span>
+    <span class="n">barrier</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_BARRIER</span>
+    <span class="n">sifting</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_SIFTING</span></div>
+
+
+
+<div class="viewcode-block" id="nodesel_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.nodesel_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">nodesel_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">depth_first</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NODESEL_DFS</span>
+    <span class="n">best_bound</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NODESEL_BESTBOUND</span>
+    <span class="n">best_estimate</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NODESEL_BESTEST</span>
+    <span class="n">best_estimate_alt</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NODESEL_BESTEST_ALT</span></div>
+
+
+
+<div class="viewcode-block" id="alg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.alg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">alg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_AUTOMATIC</span>
+    <span class="n">primal</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_PRIMAL</span>
+    <span class="n">dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_DUAL</span>
+    <span class="n">barrier</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_BARRIER</span>
+    <span class="n">sifting</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_SIFTING</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_NET</span>
+    <span class="n">concurrent</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_CONCURRENT</span></div>
+
+
+
+<div class="viewcode-block" id="varsel_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.varsel_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">varsel_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">min_infeasibility</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_VARSEL_MININFEAS</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_VARSEL_DEFAULT</span>
+    <span class="n">max_infeasibility</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_VARSEL_MAXINFEAS</span>
+    <span class="n">pseudo_costs</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_VARSEL_PSEUDO</span>
+    <span class="n">strong_branching</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_VARSEL_STRONG</span>
+    <span class="n">pseudo_reduced_costs</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_VARSEL_PSEUDOREDUCED</span></div>
+
+
+
+<div class="viewcode-block" id="dive_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.dive_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">dive_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">traditional</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">probing</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">guided</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="file_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.file_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">file_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">disk</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">disk_compressed</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="fpheur_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.fpheur_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">fpheur_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">feas</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">obj_and_feas</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="cardls_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.cardls_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">cardls_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">disabled</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">at_root</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">at_all_nodes</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="miqcp_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.miqcp_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">miqcp_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">QCP_at_node</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">LP_at_node</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="presolve_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.presolve_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">presolve_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">force</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">probe</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="v_agg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.v_agg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">v_agg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">moderate</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">aggressive</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">very_aggressive</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="kappastats_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.kappastats_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">kappastats_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="agg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.agg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">agg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">moderate</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">aggressive</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="replace_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.replace_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">replace_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">firstin_firstout</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_SOLNPOOL_FIFO</span>
+    <span class="n">worst_objective</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_SOLNPOOL_OBJ</span>
+    <span class="n">diversity</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_SOLNPOOL_DIV</span></div>
+
+
+
+<div class="viewcode-block" id="ordertype_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.ordertype_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ordertype_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPORDER_COST</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPORDER_BOUNDS</span>
+    <span class="n">scaled_cost</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_MIPORDER_SCALEDCOST</span></div>
+
+
+
+<div class="viewcode-block" id="mip_display_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.mip_display_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">mip_display_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">integer_feasible</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">mip_interval_nodes</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">node_cuts</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">LP_root</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">LP_all</span> <span class="o">=</span> <span class="mi">5</span></div>
+
+
+
+<div class="viewcode-block" id="conflict_algorithm_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.conflict_algorithm_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">conflict_algorithm_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_AUTO</span>
+    <span class="n">fast</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_FAST</span>
+    <span class="n">propagate</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_PROPAGATE</span>
+    <span class="n">presolve</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_PRESOLVE</span>
+    <span class="n">iis</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_IIS</span>
+    <span class="n">limitedsolve</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_LIMITSOLVE</span>
+    <span class="n">solve</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_CONFLICTALG_SOLVE</span></div>
+
+
+
+<div class="viewcode-block" id="dual_pricing_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.dual_pricing_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">dual_pricing_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DPRIIND_AUTO</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DPRIIND_FULL</span>
+    <span class="n">steep</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DPRIIND_STEEP</span>
+    <span class="n">full_steep</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DPRIIND_FULLSTEEP</span>
+    <span class="n">steep_Q_start</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DPRIIND_STEEPQSTART</span>
+    <span class="n">devex</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DPRIIND_DEVEX</span></div>
+
+
+
+<div class="viewcode-block" id="primal_pricing_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.primal_pricing_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">primal_pricing_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">partial</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PPRIIND_PARTIAL</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PPRIIND_AUTO</span>
+    <span class="n">devex</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PPRIIND_DEVEX</span>
+    <span class="n">steep</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PPRIIND_STEEP</span>
+    <span class="n">steep_Q_start</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PPRIIND_STEEPQSTART</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PPRIIND_FULL</span></div>
+
+
+
+<div class="viewcode-block" id="display_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.display_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">display_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">detailed</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="prered_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.prered_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">prered_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREDUCE_NOPRIMALORDUAL</span>
+    <span class="n">primal</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREDUCE_PRIMALONLY</span>
+    <span class="n">dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREDUCE_DUALONLY</span>
+    <span class="n">primal_and_dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREDUCE_PRIMALANDDUAL</span></div>
+
+
+<div class="viewcode-block" id="prereform_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.prereform_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">prereform_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREFORM_NONE</span>
+    <span class="n">interfere_crush</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREFORM_INTERFERE_CRUSH</span>
+    <span class="n">interfere_uncrush</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREFORM_INTERFERE_UNCRUSH</span>
+    <span class="nb">all</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PREREFORM_ALL</span></div>
+
+
+
+<div class="viewcode-block" id="sos1reform_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.sos1reform_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">sos1reform_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">logarithmic</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="sos2reform_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.sos2reform_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">sos2reform_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">logarithmic</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="coeffreduce_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.coeffreduce_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">coeffreduce_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="nb">any</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="dependency_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.dependency_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">dependency_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">off</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">begin</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">begin_and_end</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="dual_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.dual_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">dual_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">no</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">yes</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="linear_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.linear_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">linear_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">only_linear</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="repeatpre_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.repeatpre_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">repeatpre_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">off</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">without_cuts</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">with_cuts</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">new_root_cuts</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="sym_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.sym_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">sym_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">off</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mild</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">moderate</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">aggressive</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">more_aggressive</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">very_aggressive</span> <span class="o">=</span> <span class="mi">5</span></div>
+
+
+
+<div class="viewcode-block" id="qcpduals_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.qcpduals_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">qcpduals_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">no</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">if_possible</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">force</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="sift_alg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.sift_alg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">sift_alg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_AUTOMATIC</span>
+    <span class="n">primal</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_PRIMAL</span>
+    <span class="n">dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_DUAL</span>
+    <span class="n">barrier</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_BARRIER</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_NET</span></div>
+
+
+
+<div class="viewcode-block" id="feasopt_mode_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.feasopt_mode_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">feasopt_mode_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">min_sum</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_FEASOPT_MIN_SUM</span>
+    <span class="n">opt_sum</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_FEASOPT_OPT_SUM</span>
+    <span class="n">min_inf</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_FEASOPT_MIN_INF</span>
+    <span class="n">opt_inf</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_FEASOPT_OPT_INF</span>
+    <span class="n">min_quad</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_FEASOPT_MIN_QUAD</span>
+    <span class="n">opt_quad</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_FEASOPT_OPT_QUAD</span></div>
+
+
+
+<div class="viewcode-block" id="measure_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.measure_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">measure_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_TUNE_AVERAGE</span>
+    <span class="n">minmax</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_TUNE_MINMAX</span></div>
+
+
+
+<div class="viewcode-block" id="tune_display_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.tune_display_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">tune_display_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">minimal</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">settings_and_logs</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="bar_order_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.bar_order_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">bar_order_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">approx_min_degree</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BARORDER_AMD</span>
+    <span class="n">approx_min_fill</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BARORDER_AMF</span>
+    <span class="n">nested_dissection</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BARORDER_ND</span></div>
+
+
+
+<div class="viewcode-block" id="crossover_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.crossover_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">crossover_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_NONE</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_AUTOMATIC</span>
+    <span class="n">primal</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_PRIMAL</span>
+    <span class="n">dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_DUAL</span></div>
+
+
+
+<div class="viewcode-block" id="bar_alg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.bar_alg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">bar_alg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">infeas_estimate</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">infeas_constant</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">standard</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="bar_start_alg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.bar_start_alg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">bar_start_alg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">zero_dual</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">estimated_dual</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">average_primal_zero_dual</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">average_primal_estimated_dual</span> <span class="o">=</span> <span class="mi">4</span></div>
+
+
+
+<div class="viewcode-block" id="par_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.par_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">par_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">opportunistic</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARALLEL_OPPORTUNISTIC</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARALLEL_AUTO</span>
+    <span class="n">deterministic</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_PARALLEL_DETERMINISTIC</span></div>
+
+
+
+<div class="viewcode-block" id="qp_alg_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.qp_alg_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">qp_alg_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_AUTOMATIC</span>
+    <span class="n">primal</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_PRIMAL</span>
+    <span class="n">dual</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_DUAL</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_NET</span>
+    <span class="n">barrier</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_ALG_BARRIER</span></div>
+
+
+
+<div class="viewcode-block" id="advance_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.advance_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">advance_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">standard</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alternate</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="clocktype_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.clocktype_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">clocktype_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">CPU</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">wall</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="solutiontype_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.solutiontype_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">solutiontype_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_AUTO_SOLN</span>
+    <span class="n">basic</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BASIC_SOLN</span>
+    <span class="n">non_basic</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NONBASIC_SOLN</span></div>
+
+
+
+<div class="viewcode-block" id="optimalitytarget_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.optimalitytarget_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">optimalitytarget_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">optimal_convex</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">first_order</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">optimal_global</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="datacheck_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.datacheck_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">datacheck_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">off</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DATACHECK_OFF</span>
+    <span class="n">warn</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DATACHECK_WARN</span>
+    <span class="n">assist</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_DATACHECK_ASSIST</span></div>
+
+
+
+<div class="viewcode-block" id="benders_strategy_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.benders_strategy_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">benders_strategy_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERSSTRATEGY_OFF</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERSSTRATEGY_AUTO</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERSSTRATEGY_USER</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERSSTRATEGY_WORKERS</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_BENDERSSTRATEGY_FULL</span></div>
+
+
+
+<div class="viewcode-block" id="network_display_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.network_display_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">network_display_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_NO_DISPLAY_OBJECTIVE</span>
+    <span class="n">true_objective_values</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_TRUE_OBJECTIVE</span>
+    <span class="n">penalized_objective_values</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_PENALIZED_OBJECTIVE</span></div>
+
+
+
+<div class="viewcode-block" id="network_netfind_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.network_netfind_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">network_netfind_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">pure</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NETFIND_PURE</span>
+    <span class="n">reflection_scaling</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NETFIND_REFLECT</span>
+    <span class="n">general_scaling</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPX_NETFIND_SCALE</span></div>
+
+
+
+<div class="viewcode-block" id="network_pricing_constants">
+<a class="viewcode-back" href="../../../cplex._internal.html#cplex._internal._parameter_classes.network_pricing_constants">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">network_pricing_constants</span><span class="p">(</span><span class="n">ConstantClass</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=invalid-name</span>
+    <span class="c1"># pylint: disable=missing-docstring</span>
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
+    <span class="n">auto</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_PRICE_AUTO</span>
+    <span class="n">partial</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_PRICE_PARTIAL</span>
+    <span class="n">multiple_partial</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_PRICE_MULT_PART</span>
+    <span class="n">multiple_partial_with_sorting</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">CPXNET_PRICE_SORT_MULT_PART</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">cplex</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../cplex.html" >cplex</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../_internal.html" >cplex._internal</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cplex._internal._parameter_classes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

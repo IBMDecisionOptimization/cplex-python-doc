@@ -1,0 +1,4 @@
+<map id="inheritancef7e894628a" name="inheritancef7e894628a">
+<area shape="rect" id="node1" href="#cplex._internal._baseinterface.BaseInterface" target="_top" title="Common methods for sub&#45;interfaces." alt="" coords="6,5,109,32"/>
+<area shape="rect" id="node2" href="#cplex._internal._subinterfaces.OrderInterface" target="_top" title="Methods for setting and querying a priority order for branching." alt="" coords="5,80,110,107"/>
+</map>
