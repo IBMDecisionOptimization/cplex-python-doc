@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Why Python? &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=df05b57e" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Meet the Python API" href="03_meet_python.html" />
+    <link rel="prev" title="CPLEX for Python users" href="01_title_synopsis.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="03_meet_python.html" title="Meet the Python API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="01_title_synopsis.html" title="CPLEX for Python users"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Why Python?</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="why-python">
+<h1>Why Python?<a class="headerlink" href="#why-python" title="Link to this heading">¶</a></h1>
+<p>Introduces the Python API of CPLEX.</p>
+<p>The Python application programming interface (API) of CPLEX supports the full functionality of CPLEX. Like other APIs, it enables a user to design models and solve problems in these disciplines:</p>
+<p>linear programming (LP),</p>
+<ul class="simple">
+<li><p>linear programming (LP),</p></li>
+</ul>
+<p>mixed integer programming (MIP),</p>
+<ul class="simple">
+<li><p>mixed integer programming (MIP),</p></li>
+</ul>
+<p>quadratic programming (QP),</p>
+<ul class="simple">
+<li><p>quadratic programming (QP),</p></li>
+</ul>
+<p>quadratically constrained programming (QCP),</p>
+<ul class="simple">
+<li><p>quadratically constrained programming (QCP),</p></li>
+</ul>
+<p>second-order cone programming (SOCP),</p>
+<ul class="simple">
+<li><p>second-order cone programming (SOCP),</p></li>
+</ul>
+<p>mixed integer quadratic programming (MIQP),</p>
+<ul class="simple">
+<li><p>mixed integer quadratic programming (MIQP),</p></li>
+</ul>
+<p>mixed integer quadratically constrained programming (MIQCP).</p>
+<ul class="simple">
+<li><p>mixed integer quadratically constrained programming (MIQCP).</p></li>
+</ul>
+<p>Python itself is a freely available, open-source, cross-platform scripting language with a gentle learning curve. It enjoys a growing user-base in both industry and academia.</p>
+<p>As a scripting language, it offers an easy approach for newcomers to CPLEX. For more experienced programmers, it promises good performance and ease of development in full-fledged optimization applications.</p>
+<p>Python supports procedural, functional, and object-oriented coding paradigms. Because of its automatic memory management, Python applications do not require clean-up code, as C or C++ applications do. Thanks to its dynamic typing, Python applications do not need variable declarations, making Python applications easy to maintain or extend as modeling conditions change.</p>
+<p>As an interpreted language, Python applications do not require the usual steps of compilation and linking like other APIs. In addition, many mature libraries supporting graphic user interfaces, database queries, visualization, statistical analysis, scientific computing, and so forth, are readily available for Python applications.</p>
+<p>With those advantages of Python in general, you can use the Python API of CPLEX in a variety of ways. For example, you can use it to write scripts and applications that call CPLEX. Because of its interpreter, you can also use the Python API interactively. Like the Interactive Optimizer, the Python API of CPLEX supports important features of CPLEX, such as:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.ibm.com/docs/en/icos/22.1.2?topic=programmingconsiderations-tuning-tool">Improving performance with the Tuning Tool</a></p></li>
+<li><p><a class="reference external" href="https://www.ibm.com/docs/en/icos/22.1.2?topic=unboundedness-repairing-infeasibilities-feasopt">Repairing infeasibilities with FeasOpt</a></p></li>
+<li><p><a class="reference external" href="https://www.ibm.com/docs/en/icos/22.1.2?topic=unboundedness-diagnosing-infeasibility-by-refining-conflicts">Diagnosing infeasibility by refining conflicts</a></p></li>
+</ul>
+<p>An alternative to the Interactive Optimizer, it offers features not available there, such as callbacks and programming loops. For an example of callback programming with the Python API, see <a class="reference external" href="11_callbacks.html">Using callbacks in the Python API</a>. For a sample programming loop, see <a class="reference external" href="14_solve_seq_eg.html">Example: solving a sequence of related problems in the Python API</a></p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Python tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CPLEX for Python users</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_title_synopsis.html">CPLEX for Python users</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Why Python?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_meet_python.html">Meet the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_modify_query.html">Modifying and querying problem data in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_polymorphism.html">Using polymorphism in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_histogram_eg.html">Example: generating a histogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_query_soln.html">Querying solution information in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_nonzero_soln_vars.html">Examining variables with nonzero values in a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_display_high_precision_soln.html">Displaying high precision nonzero values of a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10_params.html">Managing CPLEX parameters in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11_callbacks.html">Using callbacks in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12_display_soln_eg.html">Example: displaying solutions with increased precision from the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13_simplex_tableau_eg.html">Example: examining the simplex tableau in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14_solve_seq_eg.html">Example: solving a sequence of related problems in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15_terminate_callback_eg.html">Example: complex termination criteria in a callback</a></li>
+</ul>
+</li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="01_title_synopsis.html"
+                          title="previous chapter">CPLEX for Python users</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="03_meet_python.html"
+                          title="next chapter">Meet the Python API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/manual/02_why_python.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="03_meet_python.html" title="Meet the Python API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="01_title_synopsis.html" title="CPLEX for Python users"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Why Python?</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

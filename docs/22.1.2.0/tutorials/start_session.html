@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Starting the CPLEX Python API &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=df05b57e" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Accessing the module cplex" href="module.html" />
+    <link rel="prev" title="Design of CPLEX in a Python application" href="Python_overview.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="module.html" title="Accessing the module cplex"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Python_overview.html" title="Design of CPLEX in a Python application"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Starting the CPLEX Python API</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="starting-the-cplex-python-api">
+<h1>Starting the CPLEX Python API<a class="headerlink" href="#starting-the-cplex-python-api" title="Link to this heading">¶</a></h1>
+<p>Use the script setup.py (supplied with the product) to
+get started with the CPLEX Python API on your system.</p>
+<p>In this tutorial, the directory where you find the CPLEX Python API (for example, as a feature of your installation of IBM ILOG CPLEX Optimization Studio) is known as <code class="docutils literal notranslate"><span class="pre">yourCPLEXhome</span></code>. In a path, such as <code class="docutils literal notranslate"><span class="pre">yourCPLEXhome/python/VERSION/PLATFORM</span></code> or <code class="docutils literal notranslate"><span class="pre">yourCPLEXhome\python\VERSION\PLATFORM</span></code>, <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> specifies one of the versions of Python compatible with CPLEX and <code class="docutils literal notranslate"><span class="pre">PLATFORM</span></code> represents the name of one of the various platforms on which the CPLEX Python API is available. In this context, a platform is a combination of operating system (such as a Microsoft Windows designation or a GNU/Linux distribution) and chip-type (such as 32- or 64-bit architecture) for which CPLEX is distributed as a feature. In that directory, you find these elements:</p>
+<p>a subdirectory named <code class="docutils literal notranslate"><span class="pre">cplex</span></code></p>
+<ul class="simple">
+<li><p>a subdirectory named cplex</p></li>
+</ul>
+<p>a file named <code class="docutils literal notranslate"><span class="pre">setup.py</span></code></p>
+<ul class="simple">
+<li><p>a file named setup.py</p></li>
+</ul>
+<p>Before you start this tutorial, you need to use that script to make your Python installation aware of your CPLEX installation. For more detail about using that script, see <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/">Setting up the Python API of CPLEX</a>.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Python_overview.html">Design of CPLEX in a Python application</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Starting the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">Accessing the module cplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex1.html">Building and solving a small LP with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read_write.html">Reading and writing CPLEX models to files with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="choose_optimizer.html">Selecting an optimizer in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex2.html">Example: reading a problem from a file lpex2.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modify_reopt.html">Modifying and re-optimizing in the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex3.html">Example: modifying a model lpex3.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html">Using CPLEX parameters in the CPLEX Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">CPLEX for Python users</a></li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="Python_overview.html"
+                          title="previous chapter">Design of CPLEX in a Python application</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="module.html"
+                          title="next chapter">Accessing the module cplex</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/start_session.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="module.html" title="Accessing the module cplex"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Python_overview.html" title="Design of CPLEX in a Python application"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Starting the CPLEX Python API</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Example: complex termination criteria in a callback &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=df05b57e" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Example: solving a sequence of related problems in the Python API" href="14_solve_seq_eg.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="14_solve_seq_eg.html" title="Example: solving a sequence of related problems in the Python API"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Example: complex termination criteria in a callback</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="example-complex-termination-criteria-in-a-callback">
+<h1>Example: complex termination criteria in a callback<a class="headerlink" href="#example-complex-termination-criteria-in-a-callback" title="Link to this heading">¶</a></h1>
+<p>Illustrates how to use a callback to set complex criteria
+for termination in the Python API.</p>
+<p>This example uses the class of informational MIP callbacks, <code class="docutils literal notranslate"><span class="pre">MIPInfoCallback</span></code>, to set <strong>multiple criteria for termination</strong> of a Python application.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For simple, straight forward termination of CPLEX (for example, to intercept a user action, such as clicking a button on a GUI), a callback is not necessary. Instead, use the method <code class="docutils literal notranslate"><span class="pre">use_aborter</span></code> of the <code class="docutils literal notranslate"><span class="pre">Cplex</span></code> object.</p>
+</div>
+<p>The class <code class="docutils literal notranslate"><span class="pre">MIPInfoCallback</span></code> can also query the incumbent solution vector, slacks on linear constraints, slacks on quadratic constraints, and other measures of progress.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">StopCriterion</span><span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">MIPInfoCallback</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_num_nodes</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+<span class="gp">... </span>      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIP_relative_gap</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">return</span>
+<span class="gp">... </span>    <span class="k">else</span><span class="p">:</span> <span class="c1"># we’ve processed fewer than 1000 nodes</span>
+<span class="gp">... </span>      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIP_relative_gap</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">return</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">cplex</span><span class="o">.</span><span class="n">Cplex</span><span class="p">(</span><span class="s2">&quot;myprob.mps&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="n">StopCriterion</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="go">[. . . CPLEX log . . .]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">MIP</span><span class="o">.</span><span class="n">get_mip_relative_gap</span><span class="p">()</span>
+<span class="go">0.093</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">get_num_nodes_processed</span><span class="p">()</span>
+<span class="go">223</span>
+</pre></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Python tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CPLEX for Python users</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_title_synopsis.html">CPLEX for Python users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_why_python.html">Why Python?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_meet_python.html">Meet the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_modify_query.html">Modifying and querying problem data in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_polymorphism.html">Using polymorphism in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_histogram_eg.html">Example: generating a histogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_query_soln.html">Querying solution information in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_nonzero_soln_vars.html">Examining variables with nonzero values in a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_display_high_precision_soln.html">Displaying high precision nonzero values of a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10_params.html">Managing CPLEX parameters in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11_callbacks.html">Using callbacks in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12_display_soln_eg.html">Example: displaying solutions with increased precision from the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13_simplex_tableau_eg.html">Example: examining the simplex tableau in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14_solve_seq_eg.html">Example: solving a sequence of related problems in the Python API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example: complex termination criteria in a callback</a></li>
+</ul>
+</li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="14_solve_seq_eg.html"
+                          title="previous chapter">Example: solving a sequence of related problems in the Python API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/manual/15_terminate_callback_eg.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="14_solve_seq_eg.html" title="Example: solving a sequence of related problems in the Python API"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Example: complex termination criteria in a callback</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

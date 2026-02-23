@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Managing CPLEX parameters in the Python API &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=df05b57e" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using callbacks in the Python API" href="11_callbacks.html" />
+    <link rel="prev" title="Displaying high precision nonzero values of a solution" href="09_display_high_precision_soln.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="11_callbacks.html" title="Using callbacks in the Python API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="09_display_high_precision_soln.html" title="Displaying high precision nonzero values of a solution"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Managing CPLEX parameters in the Python API</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="managing-cplex-parameters-in-the-python-api">
+<h1>Managing CPLEX parameters in the Python API<a class="headerlink" href="#managing-cplex-parameters-in-the-python-api" title="Link to this heading">¶</a></h1>
+<p>Documents CPLEX parameters in the Python API.</p>
+<p>CPLEX normally performs well on a wide variety of problems at default settings. However, the product offers a number of parameters that you can adjust to meet specific needs of your problem. These CPLEX parameters are documented in the reference manual, <a class="reference external" href="https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-parameters-cplex">Parameters of CPLEX</a>. That manual shows the name of each parameter in the Python, C, C++, Java, and .NET APIs, as well as the name in the Interactive Optimizer. The documentation of a parameter specifies values that the parameter can take and outlines conditions under which changing the default value of a parameter may be useful in a given problem.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For users familiar with the hierarchy of parameters in the Interactive Optimizer, the parameters of the Python API are organized in the same way.</p>
+</div>
+<section id="help-in-python-for-cplex-parameters">
+<h2>Help in Python for CPLEX parameters<a class="headerlink" href="#help-in-python-for-cplex-parameters" title="Link to this heading">¶</a></h2>
+<p>Each parameter has a <code class="docutils literal notranslate"><span class="pre">help</span></code> method that displays a short description of what the parameter does; for certain parameters, the <code class="docutils literal notranslate"><span class="pre">help</span></code> method also shows acceptable values of the parameter. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lpmethod</span><span class="o">.</span><span class="n">help</span><span class="p">())</span>
+<span class="go">method for linear optimization  :</span>
+<span class="go">  0 = automatic</span>
+<span class="go">  1 = primal simplex</span>
+<span class="go">  2 = dual simplex</span>
+<span class="go">  3 = network simplex</span>
+<span class="go">  4 = barrier</span>
+<span class="go">  5 = sifting</span>
+<span class="go">  6 = concurrent optimizers</span>
+</pre></div>
+</div>
+<p>CPLEX parameters that accept a discrete set of values have a <code class="docutils literal notranslate"><span class="pre">values</span></code> attribute. For those parameters, use the built-in Python <strong>help</strong> to see the list of possibilities. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">help</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lpmethod</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="go">Help on instance of alg_constants in module cplex._internal._parameter_classes:</span>
+
+<span class="go">class alg_constants</span>
+<span class="go"> |  Methods defined here:</span>
+<span class="go"> |</span>
+<span class="go"> |  __getitem__(self, item)</span>
+<span class="go"> |      Converts a constant to a string.</span>
+<span class="go"> |</span>
+<span class="go"> |      Example usage:</span>
+<span class="go"> |</span>
+<span class="go"> |      &gt;&gt;&gt; import cplex</span>
+<span class="go"> |      &gt;&gt;&gt; c = cplex.Cplex()</span>
+<span class="go"> |      &gt;&gt;&gt; c.parameters.mip.strategy.startalgorithm.values.auto</span>
+<span class="go"> |      0</span>
+<span class="go"> |      &gt;&gt;&gt; c.parameters.mip.strategy.startalgorithm.values[0]</span>
+<span class="go"> |      &#39;auto&#39;</span>
+<span class="go"> |</span>
+<span class="go"> |  ----------------------------------------------------------------------</span>
+<span class="go"> |  Data and other attributes defined here:</span>
+<span class="go"> |</span>
+<span class="go"> |  auto = 0</span>
+<span class="go"> |</span>
+<span class="go"> |  barrier = 4</span>
+<span class="go"> |</span>
+<span class="go"> |  concurrent = 6</span>
+<span class="go"> |</span>
+<span class="go"> |  dual = 2</span>
+<span class="go"> |</span>
+<span class="go"> |  network = 3</span>
+<span class="go"> |</span>
+<span class="go"> |  primal = 1</span>
+<span class="go"> |</span>
+<span class="go"> |  sifting = 5</span>
+</pre></div>
+</div>
+</section>
+<section id="symbolic-names-of-cplex-parameters">
+<h2>Symbolic names of CPLEX parameters<a class="headerlink" href="#symbolic-names-of-cplex-parameters" title="Link to this heading">¶</a></h2>
+<p>Parameters that accept symbolic names have a member, <code class="docutils literal notranslate"><span class="pre">values</span></code>, comprising descriptive names. For example, the following line sets the barrier optimizer as the method for solving continuous models (LPs).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lpmethod</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lpmethod</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">barrier</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="example-using-a-cplex-parameter-in-python">
+<h2>Example using a CPLEX parameter in Python<a class="headerlink" href="#example-using-a-cplex-parameter-in-python" title="Link to this heading">¶</a></h2>
+<p>As an example of a CPLEX parameter in use, here is a typical Python session that first sets a time limit of five minutes (that is, three hundred seconds) for performance tuning and then accesses the value that was just set. The example illustrates the naming pattern and calling convention of CPLEX parameters in the Python API.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">cplex</span><span class="o">.</span><span class="n">Cplex</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">tuning</span><span class="o">.</span><span class="n">timelimit</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">300.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">tuning</span><span class="o">.</span><span class="n">timelimit</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">300.0</span>
+</pre></div>
+</div>
+<p>As objects of the Python API, CPLEX parameters have methods to access their minimum, maximum, and default values, as the following lines illustrate.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">simplex</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">markowitz</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="go">0.0001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">simplex</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">markowitz</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
+<span class="go">0.01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">simplex</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">markowitz</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="go">0.99999000000000005</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">simplex</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">markowitz</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="go">Traceback … cplex.exceptions.CplexError: Invalid argument</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Python tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CPLEX for Python users</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_title_synopsis.html">CPLEX for Python users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_why_python.html">Why Python?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_meet_python.html">Meet the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_modify_query.html">Modifying and querying problem data in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_polymorphism.html">Using polymorphism in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_histogram_eg.html">Example: generating a histogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_query_soln.html">Querying solution information in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_nonzero_soln_vars.html">Examining variables with nonzero values in a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_display_high_precision_soln.html">Displaying high precision nonzero values of a solution</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Managing CPLEX parameters in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11_callbacks.html">Using callbacks in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12_display_soln_eg.html">Example: displaying solutions with increased precision from the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13_simplex_tableau_eg.html">Example: examining the simplex tableau in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14_solve_seq_eg.html">Example: solving a sequence of related problems in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15_terminate_callback_eg.html">Example: complex termination criteria in a callback</a></li>
+</ul>
+</li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="09_display_high_precision_soln.html"
+                          title="previous chapter">Displaying high precision nonzero values of a solution</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="11_callbacks.html"
+                          title="next chapter">Using callbacks in the Python API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/manual/10_params.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="11_callbacks.html" title="Using callbacks in the Python API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="09_display_high_precision_soln.html" title="Displaying high precision nonzero values of a solution"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Managing CPLEX parameters in the Python API</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

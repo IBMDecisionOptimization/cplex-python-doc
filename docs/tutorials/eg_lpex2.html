@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Example: reading a problem from a file lpex2.py &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=df05b57e" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Modifying and re-optimizing in the CPLEX Python API" href="modify_reopt.html" />
+    <link rel="prev" title="Selecting an optimizer in Python" href="choose_optimizer.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modify_reopt.html" title="Modifying and re-optimizing in the CPLEX Python API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="choose_optimizer.html" title="Selecting an optimizer in Python"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Example: reading a problem from a file lpex2.py</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="example-reading-a-problem-from-a-file-lpex2-py">
+<h1>Example: reading a problem from a file lpex2.py<a class="headerlink" href="#example-reading-a-problem-from-a-file-lpex2-py" title="Link to this heading">¶</a></h1>
+<p>The sample lpex2.py illustrates reading a problem from
+a file.</p>
+<p>The sample <code class="docutils literal notranslate"><span class="pre">lpex2.py</span></code> shows how to read an optimization problem from a file, and solve the problem with a specified optimizer option. If solution information or a simplex basis are available, the sample application prints them. Finally the sample prints the maximum infeasibility of any variable of the solution.</p>
+<p>The user passes the name of the file to read and the choice of optimizers as arguments on the command line. For example, this command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>lpex2.py<span class="w"> </span>example.mps<span class="w"> </span>d
+</pre></div>
+</div>
+<p>reads the file <code class="docutils literal notranslate"><span class="pre">example.mps</span></code> and solves the problem with the dual simplex optimizer.</p>
+<p>Alternatively, you may execute the statement:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">lpex2</span>
+</pre></div>
+</div>
+<p>within the Python interpreter and specify the problem file and optimizer interactively.</p>
+<p>In summary, this example shows how to:</p>
+<p>read a model from a formatted file;</p>
+<ul class="simple">
+<li><p>read a model from a formatted file;</p></li>
+</ul>
+<p>select the optimizer;</p>
+<ul class="simple">
+<li><p>select the optimizer;</p></li>
+</ul>
+<p>access basis information;</p>
+<ul class="simple">
+<li><p>access basis information;</p></li>
+</ul>
+<p>query quality measures of the solution.</p>
+<ul class="simple">
+<li><p>query quality measures of the solution.</p></li>
+</ul>
+<p>The general structure of this sample is similar to the sample <code class="docutils literal notranslate"><span class="pre">lpex1.py</span></code>. It starts by creating an instance of the class <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html">Cplex</a>. A try/except statement encloses the code that follows to handle errors gracefully. You can see the complete application online in the standard distribution of the product at <code class="docutils literal notranslate"><span class="pre">yourCPLEXHome/examples/src/python/lpex2.py</span></code>.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Python_overview.html">Design of CPLEX in a Python application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start_session.html">Starting the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">Accessing the module cplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex1.html">Building and solving a small LP with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read_write.html">Reading and writing CPLEX models to files with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="choose_optimizer.html">Selecting an optimizer in Python</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example: reading a problem from a file lpex2.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modify_reopt.html">Modifying and re-optimizing in the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex3.html">Example: modifying a model lpex3.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html">Using CPLEX parameters in the CPLEX Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">CPLEX for Python users</a></li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="choose_optimizer.html"
+                          title="previous chapter">Selecting an optimizer in Python</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="modify_reopt.html"
+                          title="next chapter">Modifying and re-optimizing in the CPLEX Python API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/eg_lpex2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modify_reopt.html" title="Modifying and re-optimizing in the CPLEX Python API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="choose_optimizer.html" title="Selecting an optimizer in Python"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API Reference Manual 22.1.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Example: reading a problem from a file lpex2.py</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
