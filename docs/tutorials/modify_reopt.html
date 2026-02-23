@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Modifying and re-optimizing in the CPLEX Python API &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=ae0229bc" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example: modifying a model lpex3.py" href="eg_lpex3.html" />
+    <link rel="prev" title="Example: reading a problem from a file lpex2.py" href="eg_lpex2.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="eg_lpex3.html" title="Example: modifying a model lpex3.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="eg_lpex2.html" title="Example: reading a problem from a file lpex2.py"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Modifying and re-optimizing in the CPLEX Python API</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="modifying-and-re-optimizing-in-the-cplex-python-api">
+<h1>Modifying and re-optimizing in the CPLEX Python API<a class="headerlink" href="#modifying-and-re-optimizing-in-the-cplex-python-api" title="Link to this heading">¶</a></h1>
+<p>Modify a model and re-optimize in the CPLEX Python API to see the
+effect.</p>
+<p>In many situations, the solution to a model is only the first step. One of the important features of the CPLEX Python API is the ability to modify and then re-optimize the model even after it has been created and solved one or more times.</p>
+<p>After CPLEX solves a problem, you can add, remove, or modify constraints to produce a different but related model. When you modify a problem, CPLEX tries to maintain as much information from the previous solution as reasonable and possible, in order to have a better start when it solves the modified problem. In particular, when solving LPs or QPs with a simplex optimizer, CPLEX attempts to maintain a basis which will be used the next time the method <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html#cplex.Cplex.solve">solve</a> is invoked, with the aim of making subsequent solves go faster.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Python_overview.html">Design of CPLEX in a Python application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start_session.html">Starting the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">Accessing the module cplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex1.html">Building and solving a small LP with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read_write.html">Reading and writing CPLEX models to files with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="choose_optimizer.html">Selecting an optimizer in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex2.html">Example: reading a problem from a file lpex2.py</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Modifying and re-optimizing in the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex3.html">Example: modifying a model lpex3.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html">Using CPLEX parameters in the CPLEX Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">CPLEX for Python users</a></li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="eg_lpex2.html"
+                          title="previous chapter">Example: reading a problem from a file lpex2.py</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="eg_lpex3.html"
+                          title="next chapter">Example: modifying a model lpex3.py</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/modify_reopt.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="eg_lpex3.html" title="Example: modifying a model lpex3.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="eg_lpex2.html" title="Example: reading a problem from a file lpex2.py"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Modifying and re-optimizing in the CPLEX Python API</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

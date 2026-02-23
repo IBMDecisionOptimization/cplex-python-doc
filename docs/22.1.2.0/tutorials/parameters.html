@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Using CPLEX parameters in the CPLEX Python API &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=ae0229bc" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CPLEX for Python users" href="../manual/index.html" />
+    <link rel="prev" title="Example: modifying a model lpex3.py" href="eg_lpex3.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../manual/index.html" title="CPLEX for Python users"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="eg_lpex3.html" title="Example: modifying a model lpex3.py"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Using CPLEX parameters in the CPLEX Python API</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="using-cplex-parameters-in-the-cplex-python-api">
+<h1>Using CPLEX parameters in the CPLEX Python API<a class="headerlink" href="#using-cplex-parameters-in-the-cplex-python-api" title="Link to this heading">¶</a></h1>
+<p>Manage CPLEX parameters in the CPLEX Python API.</p>
+<p>For CPLEX users familiar with the Interactive Optimizer, setting and querying parameters in the CPLEX Python API is similar to parameter handling in the Interactive Optimizer. The class <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html">Cplex</a> offers a data member named <code class="docutils literal notranslate"><span class="pre">parameters</span></code> containing names of parameters (such as <code class="docutils literal notranslate"><span class="pre">lpmethod</span></code> and <code class="docutils literal notranslate"><span class="pre">threads</span></code>) and names of groups of related parameters (such as <code class="docutils literal notranslate"><span class="pre">barrier</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code>). These groups can in turn contain individual parameters and groups of parameters themselves. The hierarchy is the same as that found in the Interactive Optimizer, with the exception of parameters such as <code class="docutils literal notranslate"><span class="pre">output</span> <span class="pre">dialog</span></code>; their functionality is handled by other parts of the CPLEX Python API.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you are already familiar with the names of parameters in the Interactive Optimizer, then you quickly recognize names of parameters in the Python API. For example, the command “<code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">mip</span> <span class="pre">limits</span> <span class="pre">nodes</span> <span class="pre">1</span></code>” in the Interactive Optimizer corresponds to “<code class="docutils literal notranslate"><span class="pre">c.parameters.mip.limits.nodes.set(1)</span></code>” in a Python session.</p>
+</div>
+<p>For users whose first contact with CPLEX is through the CPLEX Python API, the following topics introduce setting parameters, querying their current value, and using groups of parameters.</p>
+<section id="setting-and-querying-parameters-in-the-cplex-python-api">
+<h2>Setting and querying parameters in the CPLEX Python API<a class="headerlink" href="#setting-and-querying-parameters-in-the-cplex-python-api" title="Link to this heading">¶</a></h2>
+<p>As objects themselves, parameters offer the following <strong>methods</strong>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">get()</span></code> returns the current value of the parameter.</p>
+<ul class="simple">
+<li><p>get() returns the current value of the parameter.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">set(value)</span></code> sets the invoking parameter to <code class="docutils literal notranslate"><span class="pre">value</span></code>. If <code class="docutils literal notranslate"><span class="pre">value</span></code> is of the wrong type for the invoking parameter, or if <code class="docutils literal notranslate"><span class="pre">value</span></code> is less than the minimum value or greater than the maximum value for the parameter, CPLEX raises an exception.</p>
+<ul class="simple">
+<li><p>set(value) sets the invoking parameter to value . If value is of the wrong type for the invoking parameter, or if value is less than the minimum value or greater than the maximum value for the parameter, CPLEX raises an exception.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">reset()</span></code> sets the parameter to its default value.</p>
+<ul class="simple">
+<li><p>reset() sets the parameter to its default value.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">default()</span></code> returns the default value of the parameter.</p>
+<ul class="simple">
+<li><p>default() returns the default value of the parameter.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">type()</span></code> returns the type of the parameter.</p>
+<ul class="simple">
+<li><p>type() returns the type of the parameter.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">help()</span></code> returns a brief description of the parameter.</p>
+<ul class="simple">
+<li><p>help() returns a brief description of the parameter.</p></li>
+</ul>
+<p><strong>Numerical parameters</strong> offer these additional methods:</p>
+<p><code class="docutils literal notranslate"><span class="pre">min()</span></code> returns the minimum value allowed for the parameter.</p>
+<ul class="simple">
+<li><p>min() returns the minimum value allowed for the parameter.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">max()</span></code> returns the maximum value allowed for the parameter.</p>
+<ul class="simple">
+<li><p>max() returns the maximum value allowed for the parameter.</p></li>
+</ul>
+<p>Parameters of type <code class="docutils literal notranslate"><span class="pre">float</span></code> with no restrictions on their value return 0.0 (zero) when you invoke the method <code class="docutils literal notranslate"><span class="pre">min()</span></code> or <code class="docutils literal notranslate"><span class="pre">max()</span></code>.</p>
+<p>Certain integer parameters, such as <code class="docutils literal notranslate"><span class="pre">lpmethod</span></code>, have values with a special meaning. Such parameters also have a <strong>data attribute</strong> named <code class="docutils literal notranslate"><span class="pre">values</span></code>, which has as its attributes the values that the parameter can take. For example, if <code class="docutils literal notranslate"><span class="pre">cpx</span></code> is an instance of the class <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html">Cplex</a> encapsulating an LP problem, then:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cpx</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lpmethod</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cpx</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">lpmethod</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">primal</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cpx</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>results in CPLEX solving the problem by the primal simplex optimizer.</p>
+</section>
+<section id="parameter-groups">
+<h2>Parameter groups<a class="headerlink" href="#parameter-groups" title="Link to this heading">¶</a></h2>
+<p>For your convenience, CPLEX parameters are organized into groups of parameters that you can manage simultaneously. A <strong>parameter group</strong> is an instance of the class <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex._internal.html#cplex._internal._parameter_classes.ParameterGroup">ParameterGroup</a>.</p>
+<p>The class <code class="docutils literal notranslate"><span class="pre">ParameterGroup</span></code> offers these methods:</p>
+<p><code class="docutils literal notranslate"><span class="pre">reset</span></code> sets all parameters within the group to their default value.</p>
+<ul class="simple">
+<li><p>reset sets all parameters within the group to their default value.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">get_changed</span></code> returns a list of pairs (parameter, current value) for the members of the group not currently at their default value.</p>
+<ul class="simple">
+<li><p>get_changed returns a list of pairs (parameter, current value) for the members of the group not currently at their default value.</p></li>
+</ul>
+<p>The parameter group that encompasses all parameters is an instance of the class <code class="docutils literal notranslate"><span class="pre">RootParameterGroup</span></code>, a subclass of the class <code class="docutils literal notranslate"><span class="pre">ParameterGroup</span></code>. It offers these methods:</p>
+<p><code class="docutils literal notranslate"><span class="pre">read(filename)</span></code> reads a set of parameters from the named file.</p>
+<ul class="simple">
+<li><p>read(filename) reads a set of parameters from the named file.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">write(filename)</span></code> writes a set of parameters to the named file.</p>
+<ul class="simple">
+<li><p>write(filename) writes a set of parameters to the named file.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">tune_problem(fixed_parameters_and_values=[])</span></code> tunes the parameters to improve performance on an instance of the class <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html">Cplex</a>. The argument <code class="docutils literal notranslate"><span class="pre">fixed_parameters_and_values</span></code> is a sequence of pairs (parameter, value) as returned by the method <code class="docutils literal notranslate"><span class="pre">ParameterGroup.get_changed</span></code>.</p>
+<ul class="simple">
+<li><p>tune_problem(fixed_parameters_and_values=[]) tunes the parameters to improve performance on an instance of the class Cplex . The argument fixed_parameters_and_values is a sequence of pairs (parameter, value) as returned by the method ParameterGroup.get_changed .</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">tune_problem_set(filenames,</span> <span class="pre">filetypes=[],</span> <span class="pre">fixed_parameters_and_values=[])</span></code> tunes the parameters to improve performance on a set of problems. Again, the argument <code class="docutils literal notranslate"><span class="pre">fixed_parameters_and_values</span></code> is a sequence of pairs (parameter, value) as returned by the method <code class="docutils literal notranslate"><span class="pre">ParameterGroup.get_changed</span></code>.</p>
+<ul class="simple">
+<li><p>tune_problem_set(filenames, filetypes=[], fixed_parameters_and_values=[]) tunes the parameters to improve performance on a set of problems. Again, the argument fixed_parameters_and_values is a sequence of pairs (parameter, value) as returned by the method ParameterGroup.get_changed .</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Python_overview.html">Design of CPLEX in a Python application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start_session.html">Starting the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">Accessing the module cplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex1.html">Building and solving a small LP with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read_write.html">Reading and writing CPLEX models to files with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="choose_optimizer.html">Selecting an optimizer in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex2.html">Example: reading a problem from a file lpex2.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modify_reopt.html">Modifying and re-optimizing in the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex3.html">Example: modifying a model lpex3.py</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using CPLEX parameters in the CPLEX Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">CPLEX for Python users</a></li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="eg_lpex3.html"
+                          title="previous chapter">Example: modifying a model lpex3.py</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../manual/index.html"
+                          title="next chapter">CPLEX for Python users</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/parameters.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../manual/index.html" title="CPLEX for Python users"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="eg_lpex3.html" title="Example: modifying a model lpex3.py"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Using CPLEX parameters in the CPLEX Python API</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

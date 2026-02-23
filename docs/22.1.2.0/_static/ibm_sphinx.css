@@ -1,0 +1,543 @@
+/* IBM CPLEX Python API - Sphinx Theme Customization
+ * This CSS file provides IBM branding for Sphinx-generated documentation
+ * while maintaining compatibility with the Sphinx classic theme.
+ */
+
+/* Override body background from classic theme's dark teal (#11303d) */
+body {
+    background-color: #f0f0f0 !important;
+}
+
+/* Body and General Styles */
+body {
+    font-family: sans-serif;
+    font-size: 13px;
+    background: #ffffff !important;
+    color: #000000;
+}
+
+/* Links - IBM Colors */
+a:link {
+    color: #005da0;
+}
+
+a:visited {
+    color: #704d90;
+}
+
+a:hover,
+a:active {
+    color: #d7bb7a;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
+    color: #4a6589;
+}
+
+h1 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: normal;
+}
+
+/* Code and Pre-formatted Text */
+code, pre {
+    font-size: 13px;
+}
+
+/* Navigation Bar - Top header (muted blue-gray like DOcplex) */
+div.related {
+    background: #4a6589;
+    color: #ffffff;
+    border: 0px;
+}
+
+div.related a {
+    color: #ffffff;
+}
+
+div.related a:visited {
+    color: #ffffff;
+}
+
+div.related a:hover {
+    color: #d7bb7a;
+}
+
+/* Sidebar - Light background with dark text for readability */
+div.sphinxsidebar {
+    font-size: 13px;
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    border: none !important;
+    border-right: 1px solid #d0d0d0 !important;
+}
+
+/* Sidebar wrapper - ensure background extends to top */
+div.sphinxsidebarwrapper {
+    padding-top: 10px !important;
+    background: #f0f0f0 !important;
+    border: none !important;
+}
+
+/* Override any default Sphinx borders on sidebar */
+div.sphinxsidebar * {
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+/* But keep the right border on the main sidebar */
+div.sphinxsidebar {
+    border-right: 1px solid #d0d0d0 !important;
+}
+
+/* Change "Table of Contents" text to "CPLEX Python API documentation" and make it a link */
+div.sphinxsidebar h3:first-child {
+    margin-top: 0 !important;
+    padding: 3px 5px !important;
+    line-height: 1.1 !important;
+}
+
+div.sphinxsidebar h3:first-child a {
+    font-size: 0 !important;
+    line-height: 1.1 !important;
+}
+
+div.sphinxsidebar h3:first-child a::before {
+    content: "CPLEX Python API documentation";
+    font-size: 12px !important;
+    display: block !important;
+    color: #ffffff !important;
+    line-height: 1.1 !important;
+}
+
+div.sphinxsidebar h3:first-child a:hover::before {
+    color: #ffffff !important;
+}
+
+/* Sidebar headings - white text on blue background */
+div.sphinxsidebar h3,
+div.sphinxsidebar h4 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff !important;
+    background: #4a6fa5 !important;
+    padding: 5px;
+    margin-top: 10px;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Sidebar links - high contrast */
+div.sphinxsidebar a {
+    color: #005da0 !important;
+    text-decoration: none;
+}
+
+div.sphinxsidebar a:visited {
+    color: #005da0 !important;
+}
+
+div.sphinxsidebar a:hover {
+    color: #d7bb7a !important;
+    text-decoration: underline;
+}
+
+/* Ensure "Table of Contents" and other h3/h4 heading links have white text - must come after general link rules */
+div.sphinxsidebar h3 a,
+div.sphinxsidebar h3 a:link,
+div.sphinxsidebar h3 a:visited,
+div.sphinxsidebar h4 a,
+div.sphinxsidebar h4 a:link,
+div.sphinxsidebar h4 a:visited {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+div.sphinxsidebar h3 a:hover,
+div.sphinxsidebar h4 a:hover {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+/* Fix for Table of Contents - ensure all items are visible */
+div.sphinxsidebar ul {
+    color: #000000 !important;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+div.sphinxsidebar ul li {
+    color: #000000 !important;
+    padding: 2px 0;
+}
+
+div.sphinxsidebar ul li a {
+    color: #005da0 !important;
+}
+
+/* Nested list items */
+div.sphinxsidebar ul ul {
+    padding-left: 20px;
+}
+
+div.sphinxsidebar ul ul li {
+    color: #000000 !important;
+}
+
+div.sphinxsidebar ul ul li a {
+    color: #005da0 !important;
+}
+
+/* Current page in TOC */
+div.sphinxsidebar li.current > a {
+    font-weight: bold;
+    color: #000000 !important;
+}
+
+/* Caption text (like "Contents:") */
+div.sphinxsidebar p.caption {
+    color: #000000 !important;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Hide "This Page" section (contains "Show Source") */
+/* Hide the "This Page" h3 heading */
+div.sphinxsidebar h3:contains("This Page") {
+    display: none !important;
+}
+
+/* Hide the ul.this-page-menu that contains "Show Source" */
+ul.this-page-menu {
+    display: none !important;
+}
+
+/* Fallback: Hide any h3 that contains "This Page" text */
+div.sphinxsidebar h3 {
+    &:has(+ ul.this-page-menu) {
+        display: none !important;
+    }
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+table.docutils {
+    border: 1px solid #608090;
+}
+
+table.docutils td,
+table.docutils th {
+    border: 1px solid #608090;
+    padding: 4px;
+}
+
+table.docutils th {
+    background: #4a6fa5;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Code Blocks */
+div.highlight pre {
+    background: #f0f0f0;
+    border: 1px solid #708890;
+    padding: 0.5em;
+    font-size: 13px;
+}
+
+/* Admonitions (Notes, Warnings, etc.) */
+div.admonition {
+    border: 1px solid #608090;
+    background: #ffffff;
+    padding: 0.5em;
+    margin: 1em 0;
+}
+
+div.admonition p.admonition-title {
+    font-weight: bold;
+    background: #ffffff;
+    margin: -0.5em -0.5em 0.5em -0.5em;
+    padding: 0.3em 0.5em;
+}
+
+div.note {
+    background: #ffffff;
+    border: 1px solid #608090;
+}
+
+div.warning {
+    background: #ffffb0;
+    border: 1px solid #c0a000;
+}
+
+/* Footer */
+div.footer {
+    font-size: 13px;
+    text-align: center;
+    padding: 1em 0;
+}
+
+/* Search Box */
+div.sphinxsidebar input {
+    font-size: 13px;
+}
+
+/* Document Body */
+div.body {
+    font-size: 13px;
+    background: #ffffff !important;
+}
+
+div.body p {
+    margin: 0.5em 0;
+}
+
+/* Document wrapper - ensure white background */
+div.document {
+    background: #ffffff !important;
+}
+
+div.documentwrapper {
+    background: #ffffff !important;
+}
+
+div.bodywrapper {
+    background: #ffffff !important;
+}
+
+/* Definition Lists */
+dl.docutils dt {
+    font-weight: bold;
+}
+
+dl.docutils dd {
+    margin-left: 2em;
+}
+
+/* Field Lists (Parameters, Returns, etc.) */
+dl.field-list {
+    margin: 1em 0;
+}
+
+dl.field-list dt {
+    font-weight: bold;
+    padding-left: 0;
+}
+
+dl.field-list dd {
+    margin-left: 2em;
+}
+
+/* Class and Function Signatures */
+dl.class > dt,
+dl.function > dt,
+dl.method > dt {
+    background: #f0f0f0;
+    border: 1px solid #608090;
+    padding: 0.3em 0.5em;
+    font-weight: bold;
+}
+
+/* Ensure proper contrast for all text */
+.sphinxsidebar p,
+.sphinxsidebar li,
+.sphinxsidebar ul,
+.sphinxsidebar div {
+    color: #000000;
+}
+
+/* Override any opacity settings that might fade text */
+.sphinxsidebar * {
+    opacity: 1 !important;
+}
+
+/* Breadcrumbs */
+div.related ul li {
+    color: #000000;
+}
+
+/* Module Index */
+table.indextable td {
+    vertical-align: top;
+}
+
+/* Footer - Match top navigation bar */
+div.footer {
+    background: #4a6589 !important;
+    min-height: 20px !important;
+    padding: 5px 10px !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    border: 0px !important;
+}
+
+/* Hide all text content in footer */
+div.footer * {
+    display: none !important;
+}
+
+/* Hide the lower navigation bar (second related div at bottom of page) */
+body > div.related:last-of-type {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* More specific selector for bottom navigation */
+div.document + div.related {
+    display: none !important;
+    visibility: hidden !important;
+}
+/* ========================================================================
+ * FINAL OVERRIDES - These must be at the end to take precedence
+ * ======================================================================== */
+
+/* Force remove all thick borders from sidebar and related elements */
+div.sphinxsidebar,
+div.sphinxsidebarwrapper,
+div.sphinxsidebar div,
+div.sphinxsidebar ul,
+div.sphinxsidebar li {
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+/* Apply only thin gray right border to sidebar */
+div.sphinxsidebar {
+    border-right: 1px solid #d0d0d0 !important;
+}
+
+/* Remove any box-shadow that might look like a border */
+div.sphinxsidebar,
+div.sphinxsidebarwrapper {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+
+/* ========================================================================
+ * SIDEBAR BUTTON FIX - Remove teal background and border
+ * ======================================================================== */
+
+/* Fix the sidebar collapse button - remove teal background and border */
+#sidebarbutton {
+    background-color: #d0d0d0 !important;
+    border-left: 1px solid #b0b0b0 !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+#sidebarbutton:hover {
+    background-color: #c0c0c0 !important;
+}
+
+/* ========================================================================
+ * HIDE SIDEBAR SCROLLBAR
+ * ======================================================================== */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+div.sphinxsidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Enable sidebar scrolling when content is long */
+div.sphinxsidebar {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Fix header at top - prevent it from scrolling */
+div.related {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    width: 100% !important;
+}
+
+/* Add padding to body to account for fixed header */
+body {
+    padding-top: 30px !important;
+}
+
+/* Ensure document wrapper doesn't overlap with fixed header */
+div.document {
+    margin-top: 0 !important;
+}
+
+/* Create centered page layout with gaps on left and right like DOcplex */
+html {
+    overflow-x: hidden !important;
+    background-color: #ffffff !important;
+}
+
+body {
+    max-width: 97% !important;
+    margin: 0 auto !important;
+    padding-top: 30px !important;
+    border-left: 1px solid #d0d0d0 !important;
+    border-right: 1px solid #d0d0d0 !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure document wrapper doesn't overflow */
+div.document,
+div.documentwrapper,
+div.bodywrapper,
+div.body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+
+/* Prevent code blocks and tables from causing overflow */
+pre, code, table {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+div.sphinxsidebar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Make the sidebar button thinner to match the border */
+#sidebarbutton {
+    width: 10px !important;
+    min-width: 10px !important;
+    font-size: 10px !important;
+    padding: 0 !important;
+}
+
+#sidebarbutton span {
+    font-size: 10px !important;
+}

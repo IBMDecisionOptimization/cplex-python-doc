@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Examining variables with nonzero values in a solution &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=ae0229bc" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Displaying high precision nonzero values of a solution" href="09_display_high_precision_soln.html" />
+    <link rel="prev" title="Querying solution information in the Python API" href="07_query_soln.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="09_display_high_precision_soln.html" title="Displaying high precision nonzero values of a solution"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="07_query_soln.html" title="Querying solution information in the Python API"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Examining variables with nonzero values in a solution</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="examining-variables-with-nonzero-values-in-a-solution">
+<h1>Examining variables with nonzero values in a solution<a class="headerlink" href="#examining-variables-with-nonzero-values-in-a-solution" title="Link to this heading">¶</a></h1>
+<p>Documents ways to examine nonzero variables in a solution:
+for-loop, lambda expression, function.</p>
+<p>To examine the nonzero values of variables in a solution, the Python API of CPLEX offers several alternatives.</p>
+<p>You can enter a <strong>for-loop</strong> interactively to print the solution, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_values</span><span class="p">()):</span>
+<span class="gp">... </span>  <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">!=</span><span class="mi">0</span><span class="p">):</span> <span class="c1">#leading spaces for indention</span>
+<span class="gp">... </span>     <span class="nb">print</span> <span class="s2">&quot;Solution value of &quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">get_names</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> \
+<span class="gp">... </span>           <span class="s2">&quot; is &quot;</span><span class="p">,</span> <span class="n">x</span>
+<span class="go">Solution value of  Open(1)  is  1.0</span>
+<span class="go">Solution value of  Open(2)  is  1.0 ...</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>You can enter a for-loop interactively to print the solution, like this: &gt;&gt;&gt; for i, x in enumerate(c.solution.get_values()): … if (x!=0): #leading spaces for indention … print “Solution value of “, c.variables.get_names(i), … “ is “, x Solution value of Open(1) is 1.0 Solution value of Open(2) is 1.0 …</p></li>
+</ul>
+<p>You can enter a <strong>lambda expression</strong> interactively to print the solution, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]);</span> <span class="c1"># built-in function zip</span>
+<span class="go">[(1, 3), (2, 4)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">,</span>
+<span class="go">  zip(c.variables.get_names(),c.solution.get_values()))</span>
+<span class="go">[(&#39;Open(1)&#39;, 1.0), (&#39;Open(2)&#39;, 1.0), ...</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>You can enter a lambda expression interactively to print the solution, like this: &gt;&gt;&gt; print zip([1,2],[3,4]); # built-in function zip [(1, 3), (2, 4)] &gt;&gt;&gt; print filter(lambda x:x[1]!=0, zip(c.variables.get_names(),c.solution.get_values())) [(‘Open(1)’, 1.0), (‘Open(2)’, 1.0), …</p></li>
+</ul>
+<p>You can write a reusable <strong>function</strong> to print the solution, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">display_solution_nonzero_values</span> <span class="p">(</span><span class="n">c</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_values</span><span class="p">()):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">!=</span><span class="mi">0</span><span class="p">):</span>
+<span class="gp">... </span>      <span class="nb">print</span> <span class="s2">&quot;Solution value of &quot;</span><span class="p">,</span><span class="n">c</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">get_names</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>\
+<span class="gp">... </span>            <span class="s2">&quot; is &quot;</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">display_solution_nonzero_values</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">Solution value of  Open(1)  is  1.0</span>
+<span class="go">Solution value of  Open(2)  is  1.0 ...</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>You can write a reusable function to print the solution, like this: &gt;&gt;&gt; def display_solution_nonzero_values (c): … for i, x in enumerate(c.solution.get_values()): … if (x!=0): … print “Solution value of “,c.variables.get_names(i),… “ is “, x &gt;&gt;&gt; display_solution_nonzero_values(c) Solution value of Open(1) is 1.0 Solution value of Open(2) is 1.0 …</p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Python tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CPLEX for Python users</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_title_synopsis.html">CPLEX for Python users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_why_python.html">Why Python?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_meet_python.html">Meet the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_modify_query.html">Modifying and querying problem data in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_polymorphism.html">Using polymorphism in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_histogram_eg.html">Example: generating a histogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_query_soln.html">Querying solution information in the Python API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Examining variables with nonzero values in a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_display_high_precision_soln.html">Displaying high precision nonzero values of a solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10_params.html">Managing CPLEX parameters in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11_callbacks.html">Using callbacks in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12_display_soln_eg.html">Example: displaying solutions with increased precision from the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13_simplex_tableau_eg.html">Example: examining the simplex tableau in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14_solve_seq_eg.html">Example: solving a sequence of related problems in the Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15_terminate_callback_eg.html">Example: complex termination criteria in a callback</a></li>
+</ul>
+</li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="07_query_soln.html"
+                          title="previous chapter">Querying solution information in the Python API</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="09_display_high_precision_soln.html"
+                          title="next chapter">Displaying high precision nonzero values of a solution</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/manual/08_nonzero_soln_vars.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="09_display_high_precision_soln.html" title="Displaying high precision nonzero values of a solution"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="07_query_soln.html" title="Querying solution information in the Python API"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >CPLEX for Python users</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Examining variables with nonzero values in a solution</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

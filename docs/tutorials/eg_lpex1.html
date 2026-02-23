@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Building and solving a small LP with Python &#8212; CPLEX Python API Reference Manual 22.1.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=908d05d1" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/ibm_sphinx.css?v=ae0229bc" />
+    
+    <script src="../_static/documentation_options.js?v=8a2b0fec"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reading and writing CPLEX models to files with Python" href="read_write.html" />
+    <link rel="prev" title="Accessing the module cplex" href="module.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="read_write.html" title="Reading and writing CPLEX models to files with Python"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="module.html" title="Accessing the module cplex"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building and solving a small LP with Python</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="building-and-solving-a-small-lp-with-python">
+<h1>Building and solving a small LP with Python<a class="headerlink" href="#building-and-solving-a-small-lp-with-python" title="Link to this heading">¶</a></h1>
+<p>Solve a linear programming model using the CPLEX Python
+API.</p>
+<p>After you have installed the CPLEX Python API on your system and opened a Python interactive session, you can actually build and solve a small LP model as a demonstration. The demonstration shows how to:</p>
+<p>model by rows;</p>
+<ul class="simple">
+<li><p>model by rows;</p></li>
+</ul>
+<p>model by columns;</p>
+<ul class="simple">
+<li><p>model by columns;</p></li>
+</ul>
+<p>model by nonzero elements.</p>
+<ul class="simple">
+<li><p>model by nonzero elements.</p></li>
+</ul>
+<p>The code sample, <code class="docutils literal notranslate"><span class="pre">lpex1.py</span></code>, is one of the examples in the standard distribution of the product. It is an extension of the example presented in <em>Getting Started with CPLEX</em> as <a class="reference external" href="https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-problem-statement">Problem statement</a>. The demonstration shows three different ways to define an LP problem through the CPLEX Python API, how to solve it, and how to access the solution. Here is the model that the sample optimizes:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Maximize
+x1  + 2x2 + 3x3
+subject to
+–x1 +  x2 + x3 &lt;= 20
+ x1 – 3x2 + x3 &lt;= 30
+with these bounds
+0 &lt;= x1 &lt;= 40
+0 &lt;= x2 &lt;= infinity
+0 &lt;= x3 &lt;= infinity
+</pre></div>
+</div>
+<p>First, the example checks the correctness of command-line arguments. If the command-line arguments are valid, the example creates and solves the problem within a try/except clause to handle any errors that may occur. Then, depending on the command line argument, the example calls one of the functions <code class="docutils literal notranslate"><span class="pre">populatebyrow</span></code>, <code class="docutils literal notranslate"><span class="pre">populatebycolumn</span></code>, or <code class="docutils literal notranslate"><span class="pre">populatebynonzero</span></code>, to fill the <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html">Cplex</a> object with a representation of the optimization problem. These functions generate lists containing the data that define the LP problem. After the <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html">Cplex</a> object has been populated by one of these three functions, its method <a class="reference external" href="https://ibmdecisionoptimization.github.io/cplex-python-doc/cplex.html#cplex.Cplex.solve">solve</a> invokes the optimizer in this sample.</p>
+<p>If the optimizer fails to generate a solution, CPLEX raises an exception.</p>
+<p>If a solution is found, CPLEX prints solution information to <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code> when a user’s application invokes print statements.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Cplex</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Python_overview.html">Design of CPLEX in a Python application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start_session.html">Starting the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">Accessing the module cplex</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Building and solving a small LP with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read_write.html">Reading and writing CPLEX models to files with Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="choose_optimizer.html">Selecting an optimizer in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex2.html">Example: reading a problem from a file lpex2.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modify_reopt.html">Modifying and re-optimizing in the CPLEX Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eg_lpex3.html">Example: modifying a model lpex3.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html">Using CPLEX parameters in the CPLEX Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">CPLEX for Python users</a></li>
+</ul>
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="module.html"
+                          title="previous chapter">Accessing the module cplex</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="read_write.html"
+                          title="next chapter">Reading and writing CPLEX models to files with Python</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/eg_lpex1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="read_write.html" title="Reading and writing CPLEX models to files with Python"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="module.html" title="Accessing the module cplex"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CPLEX Python API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Python tutorial</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building and solving a small LP with Python</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright IBM Corporation.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
