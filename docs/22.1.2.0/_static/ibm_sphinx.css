@@ -105,6 +105,30 @@ div.sphinxsidebar {
     border-right: 1px solid #d0d0d0 !important;
 }
 
+/* Change "Table of Contents" text to "CPLEX Python API documentation" and make it a link */
+div.sphinxsidebar h3:first-child {
+    margin-top: 0 !important;
+    padding: 3px 5px !important;
+    line-height: 1.1 !important;
+}
+
+div.sphinxsidebar h3:first-child a {
+    font-size: 0 !important;
+    line-height: 1.1 !important;
+}
+
+div.sphinxsidebar h3:first-child a::before {
+    content: "CPLEX Python API documentation";
+    font-size: 12px !important;
+    display: block !important;
+    color: #ffffff !important;
+    line-height: 1.1 !important;
+}
+
+div.sphinxsidebar h3:first-child a:hover::before {
+    color: #ffffff !important;
+}
+
 /* Sidebar headings - white text on blue background */
 div.sphinxsidebar h3,
 div.sphinxsidebar h4 {
@@ -119,11 +143,6 @@ div.sphinxsidebar h4 {
     border: none !important;
     width: 100% !important;
     box-sizing: border-box !important;
-}
-
-/* First heading should have no top margin */
-div.sphinxsidebar h3:first-child {
-    margin-top: 0 !important;
 }
 
 /* Sidebar links - high contrast */
@@ -198,6 +217,24 @@ div.sphinxsidebar p.caption {
     color: #000000 !important;
     font-weight: bold;
     margin-top: 10px;
+}
+
+/* Hide "This Page" section (contains "Show Source") */
+/* Hide the "This Page" h3 heading */
+div.sphinxsidebar h3:contains("This Page") {
+    display: none !important;
+}
+
+/* Hide the ul.this-page-menu that contains "Show Source" */
+ul.this-page-menu {
+    display: none !important;
+}
+
+/* Fallback: Hide any h3 that contains "This Page" text */
+div.sphinxsidebar h3 {
+    &:has(+ ul.this-page-menu) {
+        display: none !important;
+    }
 }
 
 /* Tables */
